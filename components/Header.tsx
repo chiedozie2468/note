@@ -7,6 +7,7 @@ import {
   SignOutButton,
 } from "@clerk/nextjs";
 import Image from "next/image";
+import Breadcrumb from "./breadcrumb";
 
 export default function Header() {
   const { user, isSignedIn } = useUser();
@@ -30,6 +31,7 @@ export default function Header() {
         </div>
 
         {/* Breadcrumbs */}
+        <Breadcrumb/>
       
         {/* Right */}
         <div className="relative">

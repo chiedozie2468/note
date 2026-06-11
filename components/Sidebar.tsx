@@ -1,5 +1,8 @@
-import React from "react";
+"use client";
+
+import React, { useMemo } from "react";
 import NewDocumentButton from "./NewDocumentButton";
+import { useCollection } from "react-firebase-hooks/firestore";
 import {
   Sheet,
   SheetContent,
@@ -8,17 +11,117 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { MenuIcon } from "lucide-react";
+import { useUser } from "@clerk/nextjs";
+import {
+  collectionGroup,
+  DocumentData,
+  query,
+  where,
+} from "firebase/firestore";
+import { db } from "@/firebase";
+import SidebarOption from "./SidebarOption";
+
+interface RoomDocument extends DocumentData {
+  id?: string;
+  createdAt: string;
+  role: "owner" | "editor";
+  roomId: string;
+  userId: string;
+}
 
 export default function Sidebar() {
+  const { user } = useUser();
+
+  const [data, loading, error] = useCollection(
+    user?.id
+      ? query(collectionGroup(db, "rooms"), where("userId", "==", user.id))
+      : null,
+  );
+
+  console.log("user:", user?.id);
+  console.log("loading:", loading);
+  console.log("error:", error);
+  console.log("data:", data?.docs.length);
+
+  const groupData = useMemo(() => {
+    if (!data) {
+      return {
+        owner: [] as RoomDocument[],
+        editor: [] as RoomDocument[],
+      };
+    }
+
+    return data.docs.reduce<{
+      owner: RoomDocument[];
+      editor: RoomDocument[];
+    }>(
+      (acc, curr) => {
+        const roomDoc = curr.data() as RoomDocument;
+
+        if (roomDoc.role === "owner") {
+          acc.owner.push({
+            id: curr.id,
+            ...roomDoc,
+          });
+        }
+        else {
+          acc.editor.push({
+            id: curr.id,
+            ...roomDoc,
+          });
+        }
+
+        return acc;
+      },
+      {
+        owner: [],
+        editor: [],
+      },
+    );
+  }, [data]);
+
   const menuOptions = (
     <>
       <NewDocumentButton />
 
-      {/* My Documents */}
-      {/* Lists.. */}
-      
+      <div className="mt-4">
+        {error ? (
+          <h2 className="text-sm text-red-500">{error.message}</h2>
+        ) : loading ? (
+          <h2 className="text-sm text-gray-500">Loading...</h2>
+        ) : groupData.owner.length === 0 ? (
+          <h2 className="text-sm font-bold text-gray-500">No Document</h2>
+        ) : (
+          <>
+            <h2 className="text-sm font-bold text-gray-700 mb-2">
+              My Documents
+            </h2>
+
+            {groupData.owner.map((doc) => (
+              <SidebarOption
+                key={doc.id}
+                href={`/doc/${doc.id}`}
+                id={doc.id!}
+              />
+            ))}
+          </>
+        )}
+      </div>
+
       {/* shared with me */}
-      {/* list.. */}
+      {groupData.editor.length > 0 && (
+        <>
+          <h2 className="text-sm font-bold text-gray-700 mb-2">
+            Shared with Me
+          </h2>
+
+          {groupData.editor.map((doc) => (
+            <SidebarOption key={doc.id} href={`/doc/${doc.id}`} id={doc.id!} />
+          ))}
+        </>
+      )}
+
+      {/*  */}
     </>
   );
 

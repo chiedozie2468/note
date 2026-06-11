@@ -5,15 +5,15 @@ import {
     getApp,
     cert,
 } from "firebase-admin/app"
+import type { ServiceAccount } from "firebase-admin"
 import {getFirestore} from "firebase-admin/firestore"
-
-const servicekey = require("@/service_key.json")
+import servicekey from "./service_key.json"
 
 let app: App
 
 if (getApps().length === 0) {
     app = initializeApp({
-        credential: cert(servicekey),
+        credential: cert(servicekey as ServiceAccount),
     });
 } else {
     app = getApp(); 

@@ -1,0 +1,40 @@
+"use client";
+
+import { db } from "@/firebase";
+import { doc } from "firebase/firestore";
+import { useDocument } from "react-firebase-hooks/firestore";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import React from "react";
+
+function SidebarOption({ href, id }: { href: string; id: string }) {
+  const [data] = useDocument(doc(db, "documents", id));
+
+  const pathname = usePathname();
+  const isActive = href.includes(pathname) && pathname !== "/";
+
+  if (!data) return null;
+
+  return (
+    <Link
+      href={href}
+      className={`
+        block
+        px-4 py-3
+        mb-2
+        rounded-md
+        border
+        transition
+        hover:bg-gray-300
+        hover:shadow-sm
+        ${isActive ? "bg-gray-300 font-bold border-black" : "border-gray-400"}
+      `}
+    >
+      <p className="text-sm font-medium text-gray-700 truncate">
+        {data.data()?.title}
+      </p>
+    </Link>
+  );
+}
+
+export default SidebarOption;
