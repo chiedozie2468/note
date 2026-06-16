@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   useUser,
   SignInButton,
@@ -15,7 +15,10 @@ import { Button } from "@/components/ui/button";
 export default function Header() {
   const { user, isSignedIn } = useUser();
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const { resolvedTheme, setTheme } = useTheme();
+
+  useEffect(() => { setMounted(true); }, []);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-zinc-800 bg-white/90 dark:bg-zinc-950/90 backdrop-blur">
@@ -39,20 +42,22 @@ export default function Header() {
       
         {/* Right */}
         <div className="flex items-center gap-4">
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-            className="rounded-xl border-slate-200 dark:border-zinc-800 text-slate-900 dark:text-slate-100 bg-white dark:bg-zinc-900 hover:bg-slate-100 dark:hover:bg-zinc-800"
-            title="Toggle Theme"
-          >
-            {resolvedTheme === "dark" ? (
-              <SunIcon className="h-4 w-4" />
-            ) : (
-              <MoonIcon className="h-4 w-4" />
-            )}
-          </Button>
+          {mounted && (
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+              className="rounded-xl border-slate-200 dark:border-zinc-800 text-slate-900 dark:text-slate-100 bg-white dark:bg-zinc-900 hover:bg-slate-100 dark:hover:bg-zinc-800"
+              title="Toggle Theme"
+            >
+              {resolvedTheme === "dark" ? (
+                <SunIcon className="h-4 w-4" />
+              ) : (
+                <MoonIcon className="h-4 w-4" />
+              )}
+            </Button>
+          )}
 
           <div className="relative">
             {!isSignedIn ? (
