@@ -98,10 +98,7 @@ export async function deleteDocument(roomId: string) {
   }
 }
 
-export async function inviteUserToDocument(
-  roomId: string,
-  email: string
-) {
+export async function inviteUserToDocument(roomId: string, email: string) {
   await auth.protect();
 
   console.log("=================================");
@@ -112,29 +109,20 @@ export async function inviteUserToDocument(
 
   try {
     // Show every user in Firestore
-    const allUsers = await adminDb
-  .collection("users")
-  .get();
+    const allUsers = await adminDb.collection("users").get();
 
-console.log(
-  "TOTAL USERS:",
-  allUsers.size
-);
+    console.log("TOTAL USERS:", allUsers.size);
 
-allUsers.docs.forEach((doc) => {
-  console.log(
-    "USER DOC:",
-    doc.id,
-    doc.data()
-  );
-});
+    allUsers.docs.forEach((doc) => {
+      console.log("USER DOC:", doc.id, doc.data());
+    });
 
     console.log(
       "ALL USERS:",
       allUsers.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
-      }))
+      })),
     );
 
     // Find user by email
@@ -149,7 +137,7 @@ allUsers.docs.forEach((doc) => {
       usersSnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
-      }))
+      })),
     );
 
     if (usersSnapshot.empty) {
@@ -163,11 +151,7 @@ allUsers.docs.forEach((doc) => {
 
     const invitedUser = usersSnapshot.docs[0];
 
-    console.log(
-      "FOUND USER:",
-      invitedUser.id,
-      invitedUser.data()
-    );
+    console.log("FOUND USER:", invitedUser.id, invitedUser.data());
 
     await adminDb
       .collection("users")

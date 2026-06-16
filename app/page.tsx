@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import NewDocumentButton from "@/components/NewDocumentButton";
 import { ArrowUpRight, FileText } from "lucide-react";
 
 export default function Home() {
@@ -19,10 +19,10 @@ export default function Home() {
         </p>
 
         <div className="mt-8 flex justify-center">
-          <Button size="lg" className="gap-2">
+          <NewDocumentButton size="lg" className="gap-2">
             Create New Document
             <ArrowUpRight className="h-4 w-4" />
-          </Button>
+          </NewDocumentButton>
         </div>
 
         <div className="mt-12 grid gap-4 sm:grid-cols-3">

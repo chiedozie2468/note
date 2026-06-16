@@ -6,7 +6,15 @@ import { useUser, SignInButton } from "@clerk/nextjs";
 import { Button } from "./ui/button";
 import { createNewDocument } from "@/actions/actions";
 
-export default function NewDocumentButton() {
+export default function NewDocumentButton({
+  className,
+  size,
+  children,
+}: {
+  className?: string;
+  size?: "default" | "sm" | "lg" | "icon" | null | undefined;
+  children?: React.ReactNode;
+}) {
   const [isPending, startTransition] = React.useTransition();
   const { isSignedIn } = useUser();
   const router = useRouter();
@@ -26,14 +34,21 @@ export default function NewDocumentButton() {
   if (!isSignedIn) {
     return (
       <SignInButton mode="modal">
-        <Button>Create Document</Button>
+        <Button size={size || "default"} className={className}>
+          {children || "Create Document"}
+        </Button>
       </SignInButton>
     );
   }
 
   return (
-    <Button onClick={handleCreateNewDocument} disabled={isPending}>
-      {isPending ? "Creating..." : "New Document"}
+    <Button
+      onClick={handleCreateNewDocument}
+      disabled={isPending}
+      size={size || "default"}
+      className={className}
+    >
+      {isPending ? "Creating..." : (children || "New Document")}
     </Button>
   );
 }

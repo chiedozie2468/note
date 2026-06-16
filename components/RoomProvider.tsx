@@ -10,10 +10,7 @@ export default function RoomProvider({
   children: React.ReactNode;
 }) {
   return (
-    <LiveblocksRoomProvider
-      id={roomId}
-      initialPresence={{ cursor: null }}
-    >
+    <LiveblocksRoomProvider id={roomId} initialPresence={{ cursor: null }}>
       {children}
     </LiveblocksRoomProvider>
   );
