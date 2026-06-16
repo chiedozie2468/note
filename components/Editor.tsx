@@ -29,12 +29,14 @@ function BlockNote({ doc, provider, darkMode }: any) {
   });
 
   return (
-    <div className="h-full w-full">
-      <BlockNoteView
-        editor={editor}
-        theme={darkMode ? "dark" : "light"}
-        className="h-full w-full"
-      />
+    <div className="h-full w-full overflow-y-auto px-8 py-10 md:px-16 md:py-12">
+      <div className="max-w-4xl mx-auto min-h-full">
+        <BlockNoteView
+          editor={editor}
+          theme={darkMode ? "dark" : "light"}
+          className="min-h-full"
+        />
+      </div>
     </div>
   );
 }
