@@ -7,6 +7,7 @@ import {
   UserButton,
 } from "@clerk/nextjs";
 import Image from "next/image";
+import Link from "next/link";
 import Breadcrumb from "./breadcrumb";
 import { useTheme } from "next-themes";
 import { SunIcon, MoonIcon } from "lucide-react";
@@ -59,7 +60,15 @@ export default function Header() {
             </Button>
           )}
 
-          <div className="flex items-center">
+          <div className="flex items-center gap-3">
+            {isSignedIn && (
+              <Link href="/profile" passHref>
+                <Button variant="ghost" className="rounded-xl font-medium text-sm text-slate-700 dark:text-zinc-300">
+                  Profile Settings
+                </Button>
+              </Link>
+            )}
+
             {!isSignedIn ? (
               <SignInButton mode="modal">
                 <button className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800">
