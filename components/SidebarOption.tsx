@@ -26,11 +26,12 @@ function SidebarOption({ href, id }: { href: string; id: string }) {
         border
         transition
         hover:bg-gray-300
+        dark:hover:bg-zinc-800
         hover:shadow-sm
-        ${isActive ? "bg-gray-300 font-bold border-black" : "border-gray-400"}
+        ${isActive ? "bg-gray-300 dark:bg-zinc-700 font-bold border-black dark:border-zinc-400" : "border-gray-400 dark:border-zinc-700"}
       `}
     >
-      <p className="text-sm font-medium text-gray-700 truncate">
+      <p className="text-sm font-medium text-gray-700 dark:text-zinc-200 truncate">
         {data.data()?.title}
       </p>
     </Link>

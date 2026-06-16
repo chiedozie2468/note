@@ -5,6 +5,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import { Toaster } from "sonner";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,17 +34,19 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ClerkProvider>
-          <Header />
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <Header />
 
-          <div className="flex min-h-screen">
-            <Sidebar />
+            <div className="flex min-h-screen">
+              <Sidebar />
 
-            <main className="flex-1 overflow-y-auto bg-slate-100 p-4">
-              {children}
-            </main>
-          </div>
+              <main className="flex-1 overflow-y-auto bg-slate-100 dark:bg-zinc-950 p-4">
+                {children}
+              </main>
+            </div>
 
-          <Toaster position="top-center" />
+            <Toaster position="top-center" />
+          </ThemeProvider>
         </ClerkProvider>
       </body>
     </html>

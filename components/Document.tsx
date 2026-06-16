@@ -11,7 +11,8 @@ import Editor from "./Editor";
 import useUserOwn from "@/lib/userOwn";
 import DeleteDocument from "./DeleteDocument";
 import InviteUser from "./InviteUser";
-import { Pencil, MoonIcon, SunIcon } from "lucide-react";
+import { useTheme } from "next-themes";
+import { Pencil } from "lucide-react";
 
 function Document({ id }: { id: string }) {
   const documentRef = doc(db, "documents", id);
@@ -20,7 +21,8 @@ function Document({ id }: { id: string }) {
 
   const [input, setInput] = useState("");
   const [isPending, startTransition] = useTransition();
-  const [darkMode, setDarkMode] = useState(false);
+  const { resolvedTheme } = useTheme();
+  const isDarkMode = resolvedTheme === "dark";
 
   const isOwner = useUserOwn();
 
@@ -98,19 +100,7 @@ function Document({ id }: { id: string }) {
             <span className="hidden sm:inline">Update</span>
           </Button>
 
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            onClick={() => setDarkMode(!darkMode)}
-            className="rounded-xl"
-          >
-            {darkMode ? (
-              <SunIcon className="h-4 w-4" />
-            ) : (
-              <MoonIcon className="h-4 w-4" />
-            )}
-          </Button>
+
 
           {isOwner && (
             <div className="flex items-center gap-2">
@@ -126,7 +116,7 @@ function Document({ id }: { id: string }) {
         <div className="w-full max-w-6xl h-full rounded-2xl overflow-hidden border bg-white dark:bg-[#0f0f12] shadow-2xl">
          
           <ClientSideSuspense fallback={<div>Loading collaboration...</div>}>
-            <Editor darkMode={darkMode} />
+            <Editor darkMode={isDarkMode} />
           </ClientSideSuspense>
         </div>
       </div>
