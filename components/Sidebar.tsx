@@ -28,6 +28,7 @@ interface RoomDocument extends DocumentData {
   role: "owner" | "editor";
   roomId: string;
   userId: string;
+  title?: string;
 }
 
 export default function Sidebar() {
@@ -116,6 +117,7 @@ export default function Sidebar() {
                     key={doc.id}
                     href={`/doc/${doc.id}`}
                     id={doc.id!}
+                    title={doc.title}
                   />,
                   doc.id
                 )
@@ -133,7 +135,12 @@ export default function Sidebar() {
 
             {groupData.editor.map((doc) =>
               wrapWithSheetClose(
-                <SidebarOption key={doc.id} href={`/doc/${doc.id}`} id={doc.id!} />,
+                <SidebarOption
+                  key={doc.id}
+                  href={`/doc/${doc.id}`}
+                  id={doc.id!}
+                  title={doc.title}
+                />,
                 doc.id
               )
             )}

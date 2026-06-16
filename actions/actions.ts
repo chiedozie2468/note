@@ -8,10 +8,7 @@ export async function createNewDocument() {
   const { userId } = await auth();
 
   if (!userId) {
-    return {
-      success: false,
-      error: "Unauthorized",
-    };
+    return { success: false, error: "Unauthorized" };
   }
 
   try {
@@ -31,20 +28,44 @@ export async function createNewDocument() {
         userId,
         role: "owner",
         roomId: docRef.id,
+        title: "New Document",
         createdAt: new Date(),
       });
 
-    return {
-      success: true,
-      docId: docRef.id,
-    };
+    return { success: true, docId: docRef.id };
   } catch (error) {
     console.error("CREATE DOCUMENT ERROR:", error);
+    return { success: false, error: String(error) };
+  }
+}
 
-    return {
-      success: false,
-      error: String(error),
-    };
+export async function updateDocumentTitle(roomId: string, title: string) {
+  const { userId } = await auth();
+
+  if (!userId) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  try {
+    // Update the main document title
+    await adminDb.collection("documents").doc(roomId).update({ title });
+
+    // Sync title to ALL room documents (owner + all editors) so sidebar shows correct title
+    const roomsSnapshot = await adminDb
+      .collectionGroup("rooms")
+      .where("roomId", "==", roomId)
+      .get();
+
+    const batch = adminDb.batch();
+    roomsSnapshot.docs.forEach((doc) => {
+      batch.update(doc.ref, { title });
+    });
+    await batch.commit();
+
+    return { success: true };
+  } catch (error) {
+    console.error("UPDATE TITLE ERROR:", error);
+    return { success: false, error: String(error) };
   }
 }
 
@@ -52,49 +73,29 @@ export async function deleteDocument(roomId: string) {
   const { userId } = await auth();
 
   if (!userId) {
-    return {
-      success: false,
-      error: "Unauthorized",
-    };
+    return { success: false, error: "Unauthorized" };
   }
 
   try {
-    console.log("=================================");
-    console.log("DELETE DOCUMENT START");
-    console.log("ROOM ID:", roomId);
-    console.log("USER ID:", userId);
-    console.log("=================================");
-
-    // Delete document
     await adminDb.collection("documents").doc(roomId).delete();
 
-    // Find all room references
     const roomsSnapshot = await adminDb
       .collectionGroup("rooms")
       .where("roomId", "==", roomId)
       .get();
 
     const batch = adminDb.batch();
-
     roomsSnapshot.docs.forEach((doc) => {
       batch.delete(doc.ref);
     });
-
     await batch.commit();
 
-    // Delete Liveblocks room
     await liveblocks.deleteRoom(roomId);
 
-    return {
-      success: true,
-    };
+    return { success: true };
   } catch (error) {
     console.error("DELETE DOCUMENT ERROR:", error);
-
-    return {
-      success: false,
-      error: String(error),
-    };
+    return { success: false, error: String(error) };
   }
 }
 
@@ -108,50 +109,26 @@ export async function inviteUserToDocument(roomId: string, email: string) {
   console.log("=================================");
 
   try {
-    // Show every user in Firestore
-    const allUsers = await adminDb.collection("users").get();
-
-    console.log("TOTAL USERS:", allUsers.size);
-
-    allUsers.docs.forEach((doc) => {
-      console.log("USER DOC:", doc.id, doc.data());
-    });
-
-    console.log(
-      "ALL USERS:",
-      allUsers.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })),
-    );
-
-    // Find user by email
+    // Find the invited user by email
     const usersSnapshot = await adminDb
       .collection("users")
       .where("email", "==", email.trim())
       .limit(1)
       .get();
 
-    console.log(
-      "MATCHING USERS:",
-      usersSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })),
-    );
+    console.log("MATCHING USERS:", usersSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
 
     if (usersSnapshot.empty) {
       console.log("USER NOT FOUND");
-
-      return {
-        success: false,
-        error: "User not found",
-      };
+      return { success: false, error: "User not found. They must sign in to the app first before being invited." };
     }
 
     const invitedUser = usersSnapshot.docs[0];
-
     console.log("FOUND USER:", invitedUser.id, invitedUser.data());
+
+    // Fetch document title so it shows correctly in the invited user's sidebar
+    const docSnap = await adminDb.collection("documents").doc(roomId).get();
+    const title = (docSnap.data()?.title as string) ?? "Untitled";
 
     await adminDb
       .collection("users")
@@ -162,20 +139,14 @@ export async function inviteUserToDocument(roomId: string, email: string) {
         userId: invitedUser.id,
         role: "editor",
         roomId,
+        title,
         createdAt: new Date(),
       });
 
     console.log("USER INVITED SUCCESSFULLY");
-
-    return {
-      success: true,
-    };
+    return { success: true };
   } catch (error) {
     console.error("INVITE USER ERROR:", error);
-
-    return {
-      success: false,
-      error: String(error),
-    };
+    return { success: false, error: String(error) };
   }
 }

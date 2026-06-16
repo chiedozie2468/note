@@ -1,19 +1,23 @@
 "use client";
 
-import { db } from "@/firebase";
-import { doc } from "firebase/firestore";
-import { useDocument } from "react-firebase-hooks/firestore";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
 
-function SidebarOption({ href, id }: { href: string; id: string }) {
-  const [data] = useDocument(doc(db, "documents", id));
-
+// `title` is passed from the room document — no Firestore read needed here.
+// This means editors can see shared documents even if security rules restrict
+// reading the /documents/{id} collection directly.
+function SidebarOption({
+  href,
+  id,
+  title,
+}: {
+  href: string;
+  id: string;
+  title?: string;
+}) {
   const pathname = usePathname();
   const isActive = href.includes(pathname) && pathname !== "/";
-
-  if (!data) return null;
 
   return (
     <Link
@@ -28,11 +32,15 @@ function SidebarOption({ href, id }: { href: string; id: string }) {
         hover:bg-gray-300
         dark:hover:bg-zinc-800
         hover:shadow-sm
-        ${isActive ? "bg-gray-300 dark:bg-zinc-700 font-bold border-black dark:border-zinc-400" : "border-gray-400 dark:border-zinc-700"}
+        ${
+          isActive
+            ? "bg-gray-300 dark:bg-zinc-700 font-bold border-black dark:border-zinc-400"
+            : "border-gray-400 dark:border-zinc-700"
+        }
       `}
     >
       <p className="text-sm font-medium text-gray-700 dark:text-zinc-200 truncate">
-        {data.data()?.title}
+        {title ?? "Untitled"}
       </p>
     </Link>
   );

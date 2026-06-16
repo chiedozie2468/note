@@ -1,10 +1,10 @@
 "use client";
 
- import {ClientSideSuspense} from "@liveblocks/react";
-import React, { useEffect, useState, useTransition, Suspense } from "react";
+import { ClientSideSuspense } from "@liveblocks/react";
+import React, { useEffect, useState, useTransition } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc } from "firebase/firestore";
 import { useDocumentData } from "react-firebase-hooks/firestore";
 import { db } from "@/firebase";
 import Editor from "./Editor";
@@ -13,6 +13,7 @@ import DeleteDocument from "./DeleteDocument";
 import InviteUser from "./InviteUser";
 import { useTheme } from "next-themes";
 import { Pencil } from "lucide-react";
+import { updateDocumentTitle } from "@/actions/actions";
 
 function Document({ id }: { id: string }) {
   const documentRef = doc(db, "documents", id);
@@ -43,13 +44,9 @@ function Document({ id }: { id: string }) {
 
   const updateTitle = (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!input.trim()) return;
-
     startTransition(async () => {
-      await updateDoc(documentRef, {
-        title: input,
-      });
+      await updateDocumentTitle(id, input);
     });
   };
 
