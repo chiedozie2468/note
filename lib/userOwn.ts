@@ -8,7 +8,7 @@ import { useDocument } from "react-firebase-hooks/firestore";
 
 // Simply check if the current user's OWN room doc for this room has role === "owner".
 // We only read /users/{currentUserId}/rooms/{roomId} — always accessible to the user.
-export default function useUserOwn() {
+export default function useUserOwn(createdBy?: string) {
   const { user } = useUser();
   const room = useRoom();
 
@@ -16,5 +16,8 @@ export default function useUserOwn() {
     user && room ? doc(db, "users", user.id, "rooms", room.id) : null
   );
 
-  return roomDoc?.data()?.role === "owner";
+  const isOwnerByRoom = roomDoc?.data()?.role === "owner";
+  const isOwnerByCreator = createdBy && user ? createdBy === user.id : false;
+
+  return isOwnerByRoom || isOwnerByCreator;
 }

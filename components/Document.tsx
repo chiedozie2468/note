@@ -11,6 +11,7 @@ import Editor from "./Editor";
 import useUserOwn from "@/lib/userOwn";
 import DeleteDocument from "./DeleteDocument";
 import InviteUser from "./InviteUser";
+import LeaveDocument from "./LeaveDocument";
 import { useTheme } from "next-themes";
 import { Pencil } from "lucide-react";
 import { updateDocumentTitle } from "@/actions/actions";
@@ -22,7 +23,7 @@ function Document({ id }: { id: string }) {
   const [firestoreData] = useDocumentData(documentRef);
 
   // API fallback — always works (uses adminDb server-side, bypasses security rules).
-  const [apiData, setApiData] = useState<{ title?: string } | null>(null);
+  const [apiData, setApiData] = useState<{ title?: string; createdBy?: string; role?: string } | null>(null);
   const [docLoaded, setDocLoaded] = useState(false);
 
   useEffect(() => {
@@ -37,12 +38,13 @@ function Document({ id }: { id: string }) {
 
   // Prefer real-time Firestore data (owner) over API snapshot (editor).
   const title = (firestoreData?.title as string | undefined) ?? apiData?.title;
+  const createdBy = (firestoreData?.createdBy as string | undefined) ?? apiData?.createdBy;
 
   const [input, setInput] = useState("");
   const [isPending, startTransition] = useTransition();
   const { resolvedTheme } = useTheme();
   const isDarkMode = resolvedTheme === "dark";
-  const isOwner = useUserOwn();
+  const isOwner = useUserOwn(createdBy);
 
   // Sync input field whenever title resolves (from either source).
   useEffect(() => {
@@ -92,7 +94,7 @@ function Document({ id }: { id: string }) {
           />
 
           {/* Update + owner actions only visible to the owner */}
-          {isOwner && (
+          {isOwner ? (
             <>
               <Button
                 disabled={isPending}
@@ -108,6 +110,10 @@ function Document({ id }: { id: string }) {
                 <DeleteDocument />
               </div>
             </>
+          ) : (
+            <div className="flex items-center gap-2">
+              <LeaveDocument />
+            </div>
           )}
         </form>
       </div>
