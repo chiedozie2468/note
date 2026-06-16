@@ -6,6 +6,7 @@ export default function FollowPointer({
   x,
   y,
   info,
+  clicking,
 }: {
   x: number;
   y: number;
@@ -14,6 +15,7 @@ export default function FollowPointer({
     email: string;
     avatar: string;
   };
+  clicking?: boolean;
 }) {
   const color = stringToColor(info.email || "1");
 
@@ -29,6 +31,15 @@ export default function FollowPointer({
       exit={{ scale: 0, opacity: 0 }}
       transition={{ duration: 0.2, ease: "easeOut" }}
     >
+      {clicking && (
+        <motion.div
+          initial={{ scale: 0.5, opacity: 0.8 }}
+          animate={{ scale: 2.2, opacity: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="absolute top-0 left-0 h-8 w-8 rounded-full border-2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+          style={{ borderColor: color }}
+        />
+      )}
       {/* Sleek SVG Cursor Arrow */}
       <svg
         stroke={color}
