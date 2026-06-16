@@ -18,29 +18,36 @@ import { updateDocumentTitle } from "@/actions/actions";
 function Document({ id }: { id: string }) {
   const documentRef = doc(db, "documents", id);
 
-  const [data, loading, error] = useDocumentData(documentRef);
+  // Real-time Firestore listener — works for owners; may silently fail for editors.
+  const [firestoreData] = useDocumentData(documentRef);
+
+  // API fallback — always works (uses adminDb server-side, bypasses security rules).
+  const [apiData, setApiData] = useState<{ title?: string } | null>(null);
+  const [docLoaded, setDocLoaded] = useState(false);
+
+  useEffect(() => {
+    fetch(`/api/document/${id}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data) setApiData(data);
+      })
+      .catch(() => null)
+      .finally(() => setDocLoaded(true));
+  }, [id]);
+
+  // Prefer real-time Firestore data (owner) over API snapshot (editor).
+  const title = (firestoreData?.title as string | undefined) ?? apiData?.title;
 
   const [input, setInput] = useState("");
   const [isPending, startTransition] = useTransition();
   const { resolvedTheme } = useTheme();
   const isDarkMode = resolvedTheme === "dark";
-
   const isOwner = useUserOwn();
 
-  console.log("========== DOCUMENT DEBUG ==========");
-  console.log("DOCUMENT ID:", id);
-  console.log("DOCUMENT PATH:", documentRef.path);
-  console.log("LOADING:", loading);
-  console.log("DATA:", data);
-  console.log("ERROR:", error);
-  console.log("IS OWNER:", isOwner);
-  console.log("====================================");
-
+  // Sync input field whenever title resolves (from either source).
   useEffect(() => {
-    if (data?.title) {
-      setInput(data.title as string);
-    }
-  }, [data]);
+    if (title) setInput(title);
+  }, [title]);
 
   const updateTitle = (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,26 +57,20 @@ function Document({ id }: { id: string }) {
     });
   };
 
-  if (loading) {
+  // Show loading until at least the API fetch completes.
+  if (!docLoaded && !firestoreData) {
     return (
-      <div className="flex items-center justify-center h-screen text-xl">
-        Loading Firestore document...
+      <div className="flex items-center justify-center h-screen text-xl dark:text-zinc-300">
+        Loading document...
       </div>
     );
   }
 
-  if (error) {
-    return (
-      <div className="flex items-center justify-center h-screen text-red-500">
-        Firestore Error: {error.message}
-      </div>
-    );
-  }
-
-  if (!data) {
+  // If both sources returned nothing, the document doesn't exist or access is denied.
+  if (docLoaded && !firestoreData && !apiData) {
     return (
       <div className="flex items-center justify-center h-screen text-yellow-500">
-        Document not found.
+        Document not found or you do not have access.
       </div>
     );
   }
@@ -86,24 +87,27 @@ function Document({ id }: { id: string }) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             className="flex-1 h-10 rounded-xl"
+            disabled={!isOwner}
+            title={!isOwner ? "Only the owner can rename this document" : undefined}
           />
 
-          <Button
-            disabled={isPending}
-            type="submit"
-            className="rounded-xl flex items-center gap-2"
-          >
-            <Pencil className="h-4 w-4" />
-            <span className="hidden sm:inline">Update</span>
-          </Button>
-
-
-
+          {/* Update + owner actions only visible to the owner */}
           {isOwner && (
-            <div className="flex items-center gap-2">
-              <InviteUser />
-              <DeleteDocument />
-            </div>
+            <>
+              <Button
+                disabled={isPending}
+                type="submit"
+                className="rounded-xl flex items-center gap-2"
+              >
+                <Pencil className="h-4 w-4" />
+                <span className="hidden sm:inline">Update</span>
+              </Button>
+
+              <div className="flex items-center gap-2">
+                <InviteUser />
+                <DeleteDocument />
+              </div>
+            </>
           )}
         </form>
       </div>
@@ -111,8 +115,7 @@ function Document({ id }: { id: string }) {
       {/* EDITOR */}
       <div className="flex-1 w-full flex justify-center p-4 sm:p-6">
         <div className="w-full max-w-6xl h-full rounded-2xl overflow-hidden border bg-white dark:bg-[#0f0f12] shadow-2xl">
-         
-          <ClientSideSuspense fallback={<div>Loading collaboration...</div>}>
+          <ClientSideSuspense fallback={<div className="p-6 dark:text-zinc-400">Loading collaboration...</div>}>
             <Editor darkMode={isDarkMode} />
           </ClientSideSuspense>
         </div>
