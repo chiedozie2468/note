@@ -13,6 +13,7 @@ import "@blocknote/core/fonts/inter.css";
 import "@blocknote/shadcn/style.css";
 
 import stringToColor from "@/lib/stringToColor";
+import TranslateDocument from "./TranslateDocument";
 
 function BlockNote({ doc, provider, darkMode }: any) {
   const userInfo = useSelf((me) => me.info);
@@ -69,6 +70,12 @@ export default function Editor({ darkMode }: any) {
   return (
     <LiveCursorProvider>
       <div className="h-full w-full">
+        <div className="flex items-center gap-2 justify-end mb-10">
+          <TranslateDocument doc={doc} />
+          {/* TranslateDocument */}
+
+          {/* ChatToDocument */}
+        </div>
         <BlockNote doc={doc} provider={provider} darkMode={darkMode} />
       </div>
     </LiveCursorProvider>

@@ -40,10 +40,6 @@ export default function Sidebar() {
       : null,
   );
 
-  console.log("user:", user?.id);
-  console.log("loading:", loading);
-  console.log("error:", error);
-  console.log("data:", data?.docs.length);
 
   const groupData = useMemo(() => {
     if (!data) {

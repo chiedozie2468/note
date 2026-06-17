@@ -15,6 +15,8 @@ import LeaveDocument from "./LeaveDocument";
 import { useTheme } from "next-themes";
 import { Pencil } from "lucide-react";
 import { updateDocumentTitle } from "@/actions/actions";
+import ManageUser from "./ManageUser";
+import Avatar from "./Avatar";
 
 function Document({ id }: { id: string }) {
   const documentRef = doc(db, "documents", id);
@@ -23,7 +25,11 @@ function Document({ id }: { id: string }) {
   const [firestoreData] = useDocumentData(documentRef);
 
   // API fallback — always works (uses adminDb server-side, bypasses security rules).
-  const [apiData, setApiData] = useState<{ title?: string; createdBy?: string; role?: string } | null>(null);
+  const [apiData, setApiData] = useState<{
+    title?: string;
+    createdBy?: string;
+    role?: string;
+  } | null>(null);
   const [docLoaded, setDocLoaded] = useState(false);
 
   useEffect(() => {
@@ -38,7 +44,8 @@ function Document({ id }: { id: string }) {
 
   // Prefer real-time Firestore data (owner) over API snapshot (editor).
   const title = (firestoreData?.title as string | undefined) ?? apiData?.title;
-  const createdBy = (firestoreData?.createdBy as string | undefined) ?? apiData?.createdBy;
+  const createdBy =
+    (firestoreData?.createdBy as string | undefined) ?? apiData?.createdBy;
 
   const [input, setInput] = useState("");
   const [isPending, startTransition] = useTransition();
@@ -90,7 +97,9 @@ function Document({ id }: { id: string }) {
             onChange={(e) => setInput(e.target.value)}
             className="flex-1 h-10 rounded-xl"
             disabled={!isOwner}
-            title={!isOwner ? "Only the owner can rename this document" : undefined}
+            title={
+              !isOwner ? "Only the owner can rename this document" : undefined
+            }
           />
 
           {/* Update + owner actions only visible to the owner */}
@@ -118,10 +127,26 @@ function Document({ id }: { id: string }) {
         </form>
       </div>
 
+      <div className="flex max-w-6xl mx-auto justify-between items-center mb-5">
+        {/* <ManageUser/> */}
+        {/* ManageUser */}
+
+        <Avatar/>
+        {/* Avatar */}
+      </div>
+
+      <hr className="pb-10" />
+
       {/* EDITOR */}
       <div className="flex-1 w-full flex justify-center p-4 sm:p-6">
         <div className="w-full max-w-6xl h-full rounded-2xl overflow-hidden border bg-white dark:bg-[#0f0f12] shadow-2xl">
-          <ClientSideSuspense fallback={<div className="p-6 dark:text-zinc-400">Loading collaboration...</div>}>
+          <ClientSideSuspense
+            fallback={
+              <div className="p-6 dark:text-zinc-400">
+                Loading collaboration...
+              </div>
+            }
+          >
             <Editor darkMode={isDarkMode} />
           </ClientSideSuspense>
         </div>
