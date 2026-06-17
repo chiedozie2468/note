@@ -28,7 +28,9 @@ function getServiceAccount(): ServiceAccount {
         process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
 
     if (serviceAccountJson) {
-        return normalizeServiceAccount(JSON.parse(serviceAccountJson));
+        const parsed = JSON.parse(serviceAccountJson);
+
+        return normalizeServiceAccount(typeof parsed === "string" ? JSON.parse(parsed) : parsed);
     }
 
     if (process.env.FIREBASE_SERVICE_ACCOUNT_BASE64) {
