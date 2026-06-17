@@ -7,10 +7,12 @@ import {
 } from "firebase-admin/app"
 import type { ServiceAccount } from "firebase-admin"
 import {getFirestore} from "firebase-admin/firestore"
+import type { Firestore } from "firebase-admin/firestore"
 import { existsSync, readFileSync } from "fs"
 import path from "path"
 
-let app: App
+let app: App | undefined
+let db: Firestore | undefined
 
 function normalizeServiceAccount(serviceAccount: Record<string, string | undefined>): ServiceAccount {
     return {
@@ -58,13 +60,53 @@ function getServiceAccount(): ServiceAccount {
     );
 }
 
-if (getApps().length === 0) {
-    app = initializeApp({
-        credential: cert(getServiceAccount()),
-    });
-} else {
-    app = getApp(); 
+function getAdminApp(): App {
+    if (app) {
+        return app;
+    }
+
+    if (getApps().length === 0) {
+        app = initializeApp({
+            credential: cert(getServiceAccount()),
+        });
+    } else {
+        app = getApp();
+    }
+
+    return app;
 }
 
-const adminDb = getFirestore(app)
-export {app as adminApp, adminDb}
+function getAdminDb(): Firestore {
+    if (!db) {
+        db = getFirestore(getAdminApp());
+    }
+
+    return db;
+}
+
+const adminApp = new Proxy({} as App, {
+    get(_target, prop) {
+        const value = (getAdminApp() as unknown as Record<PropertyKey, unknown>)[prop];
+
+        if (typeof value === "function") {
+            return value.bind(getAdminApp());
+        }
+
+        return value;
+    },
+});
+
+const adminDb = new Proxy({} as Firestore, {
+    get(_target, prop) {
+        const firestore = getAdminDb();
+        const value = (firestore as unknown as Record<PropertyKey, unknown>)[prop];
+
+        if (typeof value === "function") {
+            return value.bind(firestore);
+        }
+
+        return value;
+    },
+});
+
+export {adminApp, adminDb}
