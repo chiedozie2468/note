@@ -2,6 +2,7 @@
 
 import { ClientSideSuspense } from "@liveblocks/react";
 import React, { useEffect, useState, useTransition } from "react";
+import Link from "next/link";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { doc } from "firebase/firestore";
@@ -13,9 +14,9 @@ import DeleteDocument from "./DeleteDocument";
 import InviteUser from "./InviteUser";
 import LeaveDocument from "./LeaveDocument";
 import { useTheme } from "next-themes";
-import { Pencil } from "lucide-react";
+import { Pencil, ListVideo } from "lucide-react";
 import { updateDocumentTitle } from "@/actions/actions";
-import ManageUser from "./ManageUser";
+import ShareDocument from "./ShareDocument";
 import Avatar from "./Avatar";
 
 function Document({ id }: { id: string }) {
@@ -85,7 +86,7 @@ function Document({ id }: { id: string }) {
   }
 
   return (
-    <div className="h-screen w-full flex flex-col bg-gradient-to-br from-zinc-50 via-white to-zinc-100 dark:from-[#0a0a0a] dark:via-[#0f0f12] dark:to-black">
+    <div className="h-screen w-full flex flex-col bg-linear-to-br from-zinc-50 via-white to-zinc-100 dark:from-[#0a0a0a] dark:via-[#0f0f12] dark:to-black">
       {/* TOP BAR */}
       <div className="w-full px-6 py-4 flex justify-center border-b border-black/5 dark:border-white/10 backdrop-blur-md bg-white/60 dark:bg-black/30">
         <form
@@ -114,13 +115,15 @@ function Document({ id }: { id: string }) {
                 <span className="hidden sm:inline">Update</span>
               </Button>
 
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <ShareDocument title={title} />
                 <InviteUser />
                 <DeleteDocument />
               </div>
             </>
           ) : (
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <ShareDocument title={title} />
               <LeaveDocument />
             </div>
           )}
@@ -128,11 +131,7 @@ function Document({ id }: { id: string }) {
       </div>
 
       <div className="flex max-w-6xl mx-auto justify-between items-center mb-5">
-        {/* <ManageUser/> */}
-        {/* ManageUser */}
-
-        <Avatar/>
-        {/* Avatar */}
+        <Avatar />
       </div>
 
       <hr className="pb-10" />

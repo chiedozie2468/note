@@ -1,7 +1,7 @@
 "use client";
 
 import LiveCursorProvider from "./LiveCursorProvider";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useRoom, useSelf } from "@liveblocks/react/suspense";
 import * as Y from "yjs";
 import { LiveblocksYjsProvider } from "@liveblocks/yjs";
@@ -18,16 +18,21 @@ import TranslateDocument from "./TranslateDocument";
 function BlockNote({ doc, provider, darkMode }: any) {
   const userInfo = useSelf((me) => me.info);
 
-  const editor = useCreateBlockNote({
-    collaboration: {
-      provider: provider as never,
-      fragment: doc.getXmlFragment("document-store"),
-      user: {
-        name: userInfo?.name ?? "Anonymous",
-        color: stringToColor(userInfo?.email ?? "anonymous@example.com"),
-      },
-    },
-  });
+  const editor = useCreateBlockNote(
+    useMemo(
+      () => ({
+        collaboration: {
+          provider: provider as never,
+          fragment: doc.getXmlFragment("document-store"),
+          user: {
+            name: userInfo?.name ?? "Anonymous",
+            color: stringToColor(userInfo?.email ?? "anonymous@example.com"),
+          },
+        },
+      }),
+      [provider, doc, userInfo?.email, userInfo?.name],
+    ),
+  );
 
   return (
     <div className="h-full w-full overflow-y-auto px-8 py-10 md:px-16 md:py-12">

@@ -12,7 +12,12 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { usePathname } from "next/navigation";
-import { inviteUserToDocument, getDocumentCollaborators, removeCollaboratorFromDocument } from "@/actions/actions";
+import { useSearchParams, useRouter } from "next/navigation";
+import {
+  inviteUserToDocument,
+  getDocumentCollaborators,
+  removeCollaboratorFromDocument,
+} from "@/actions/actions";
 import { toast } from "sonner";
 import { Input } from "./ui/input";
 
@@ -33,6 +38,8 @@ export default function InviteUser() {
 
   const pathname = usePathname();
   const roomId = pathname.split("/").pop();
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
   const fetchCollaborators = async () => {
     if (!roomId) return;
@@ -53,6 +60,20 @@ export default function InviteUser() {
     if (isOpen) {
       fetchCollaborators();
     }
+
+    // auto-open when ?invite=1 is present in the URL
+    if (!isOpen && searchParams?.get("invite") === "1") {
+      setIsOpen(true);
+
+      // remove the invite param without navigating away
+      try {
+        const url = new URL(window.location.href);
+        url.searchParams.delete("invite");
+        router.replace(url.pathname + url.search);
+      } catch (e) {
+        // ignore
+      }
+    }
   }, [isOpen]);
 
   const handleInvite = async (e: FormEvent) => {
@@ -62,10 +83,7 @@ export default function InviteUser() {
 
     startTransition(async () => {
       try {
-        const res = await inviteUserToDocument(
-          roomId,
-          email.trim()
-        );
+        const res = await inviteUserToDocument(roomId, email.trim());
 
         console.log("INVITE RESPONSE:", res);
 
@@ -73,10 +91,9 @@ export default function InviteUser() {
           toast.success("User added successfully!");
           setEmail("");
           fetchCollaborators();
-        } else {
-          toast.error(
-            res.error || "Failed to invite user"
-          );
+        }
+        else {
+          toast.error(res.error || "Failed to invite user");
         }
       } catch (error) {
         console.error(error);
@@ -93,7 +110,8 @@ export default function InviteUser() {
       if (res.success) {
         toast.success("Collaborator removed successfully");
         fetchCollaborators();
-      } else {
+      }
+      else {
         toast.error(res.error || "Failed to remove collaborator");
       }
     } catch (e) {
@@ -105,9 +123,7 @@ export default function InviteUser() {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">
-          Invite User
-        </Button>
+        <Button variant="outline">Invite User</Button>
       </DialogTrigger>
 
       <DialogContent className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 max-w-md w-full">
@@ -121,27 +137,17 @@ export default function InviteUser() {
           </DialogDescription>
         </DialogHeader>
 
-        <form
-          onSubmit={handleInvite}
-          className="flex gap-2 mb-4"
-        >
+        <form onSubmit={handleInvite} className="flex gap-2 mb-4">
           <Input
             type="email"
             placeholder="Enter email"
             value={email}
-            onChange={(e) =>
-              setEmail(e.target.value)
-            }
+            onChange={(e) => setEmail(e.target.value)}
             className="flex-1"
           />
 
-          <Button
-            type="submit"
-            disabled={!email || isPending}
-          >
-            {isPending
-              ? "Inviting..."
-              : "Invite"}
+          <Button type="submit" disabled={!email || isPending}>
+            {isPending ? "Inviting..." : "Invite"}
           </Button>
         </form>
 
@@ -150,30 +156,45 @@ export default function InviteUser() {
           <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-3">
             Collaborators
           </h3>
-          
+
           {loadingCollaborators ? (
             <div className="flex items-center justify-center py-4">
-              <span className="text-sm text-zinc-500 dark:text-zinc-400">Loading collaborators...</span>
+              <span className="text-sm text-zinc-500 dark:text-zinc-400">
+                Loading collaborators...
+              </span>
             </div>
           ) : collaborators.length === 0 ? (
             <div className="py-2">
-              <span className="text-xs text-zinc-500 dark:text-zinc-400">No other collaborators yet.</span>
+              <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                No other collaborators yet.
+              </span>
             </div>
           ) : (
             <div className="space-y-3 max-h-48 overflow-y-auto pr-1">
               {collaborators.map((c) => (
-                <div key={c.userId} className="flex items-center justify-between gap-3 text-sm p-1.5 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
+                <div
+                  key={c.userId}
+                  className="flex items-center justify-between gap-3 text-sm p-1.5 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
+                >
                   <div className="flex items-center gap-2 overflow-hidden">
                     {c.avatar ? (
-                      <img src={c.avatar} alt={c.name} className="h-7 w-7 rounded-full object-cover border border-zinc-200 dark:border-zinc-700" />
+                      <img
+                        src={c.avatar}
+                        alt={c.name}
+                        className="h-7 w-7 rounded-full object-cover border border-zinc-200 dark:border-zinc-700"
+                      />
                     ) : (
                       <div className="h-7 w-7 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-600 dark:text-zinc-400">
                         {c.name.charAt(0).toUpperCase()}
                       </div>
                     )}
                     <div className="flex flex-col min-w-0">
-                      <span className="font-medium text-zinc-900 dark:text-zinc-100 truncate">{c.name}</span>
-                      <span className="text-xs text-zinc-500 dark:text-zinc-400 truncate">{c.email}</span>
+                      <span className="font-medium text-zinc-900 dark:text-zinc-100 truncate">
+                        {c.name}
+                      </span>
+                      <span className="text-xs text-zinc-500 dark:text-zinc-400 truncate">
+                        {c.email}
+                      </span>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">

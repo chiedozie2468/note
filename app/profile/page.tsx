@@ -8,13 +8,19 @@ import { Button } from "@/components/ui/button";
 
 export default function ProfilePage() {
   return (
-    <div className="min-h-screen w-full flex flex-col bg-gradient-to-br from-zinc-50 via-white to-zinc-100 dark:from-[#0a0a0a] dark:via-[#0f0f12] dark:to-black p-4 sm:p-6 md:p-8">
+    <div className="min-h-screen w-full flex flex-col bg-linear-to-br from-zinc-50 via-white to-zinc-100 dark:from-[#0a0a0a] dark:via-[#0f0f12] dark:to-black p-4 sm:p-6 md:p-8">
       {/* Back button and title */}
       <div className="max-w-5xl w-full mx-auto mb-6">
-        <Link href="/" passHref>
-          <Button variant="ghost" className="gap-2 rounded-xl text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100">
-            <ArrowLeft className="h-4 w-4" />
-            Back to Workspace
+        <Link href="/">
+          <Button
+            asChild
+            variant="ghost"
+            className="gap-2 rounded-xl text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
+          >
+            <a>
+              <ArrowLeft className="h-4 w-4" />
+              Back to Workspace
+            </a>
           </Button>
         </Link>
       </div>
@@ -29,8 +35,10 @@ export default function ProfilePage() {
                 colorPrimary: "#0f0f12",
               },
               elements: {
-                cardBox: "shadow-none border-none max-w-full w-full bg-transparent dark:bg-transparent",
-                navbar: "bg-transparent border-r border-zinc-100 dark:border-zinc-800",
+                cardBox:
+                  "shadow-none border-none max-w-full w-full bg-transparent dark:bg-transparent",
+                navbar:
+                  "bg-transparent border-r border-zinc-100 dark:border-zinc-800",
                 pageScrollable: "bg-transparent scrollbar-thin",
               },
             }}
