@@ -13,6 +13,7 @@ import {
 type DocumentRecord = {
   id: string;
   title: string;
+  role?: string;
 };
 
 export default function DocumentSwitcher({
@@ -28,7 +29,7 @@ export default function DocumentSwitcher({
   useEffect(() => {
     let mounted = true;
 
-    fetch("/api/documents/recent")
+    fetch("/api/documents/recent", { credentials: "include" })
       .then((res) => res.json())
       .then((data) => {
         if (!mounted) return;
@@ -81,8 +82,19 @@ export default function DocumentSwitcher({
             </SelectItem>
           ) : (
             documents.map((doc) => (
-              <SelectItem key={doc.id} value={doc.id}>
-                {doc.title ?? "Untitled document"}
+              <SelectItem
+                key={doc.id}
+                value={doc.id}
+                className="flex items-center justify-between"
+              >
+                <div className="flex items-center gap-2">
+                  <span>{doc.title ?? "Untitled document"}</span>
+                  {doc.role && doc.role !== "owner" ? (
+                    <span className="text-[11px] px-2 py-0.5 rounded-full bg-blue-100 text-blue-800">
+                      Shared
+                    </span>
+                  ) : null}
+                </div>
               </SelectItem>
             ))
           )}

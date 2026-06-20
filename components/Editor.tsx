@@ -82,9 +82,10 @@ export default function Editor({ darkMode }: { darkMode: boolean }) {
   // Delay BlockNote rendering to avoid render-phase state updates
   useEffect(() => {
     if (doc && provider && userInfo && !renderBlockNote) {
-      // Defer to next event loop to ensure proper render cycle
-      const timer = setTimeout(() => setRenderBlockNote(true), 0);
-      return () => clearTimeout(timer);
+      // Defer to next animation frame to ensure DOM paint and avoid
+      // render-phase state updates in sibling components (e.g. Avatars)
+      const raf = requestAnimationFrame(() => setRenderBlockNote(true));
+      return () => cancelAnimationFrame(raf);
     }
   }, [doc, provider, userInfo, renderBlockNote]);
 

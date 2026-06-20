@@ -7,6 +7,7 @@ type Doc = {
   id: string;
   title: string;
   updatedAt?: string;
+  role?: string;
 };
 
 export default function RecentDocuments() {
@@ -36,13 +37,20 @@ export default function RecentDocuments() {
   return (
     <ul className="space-y-3">
       {docs.map((d) => (
-        <li key={d.id} className="flex items-center justify-between">
-          <Link
-            href={`/doc/${d.id}`}
-            className="text-sm font-medium text-slate-900 hover:underline"
-          >
-            {d.title}
-          </Link>
+        <li key={d.id} className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <Link
+              href={`/doc/${d.id}`}
+              className="text-sm font-medium text-slate-900 hover:underline"
+            >
+              {d.title}
+            </Link>
+            {d.role && d.role !== "owner" ? (
+              <span className="text-xs inline-flex items-center px-2 py-0.5 rounded-full bg-blue-100 text-blue-800">
+                Shared
+              </span>
+            ) : null}
+          </div>
           <span className="text-xs text-slate-400">{d.updatedAt ?? "-"}</span>
         </li>
       ))}

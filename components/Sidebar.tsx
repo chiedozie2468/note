@@ -158,6 +158,30 @@ export default function Sidebar() {
                 ))}
           </div>
         </div>
+        {/* Shared / Editor Documents */}
+        {groupData.editor.length > 0 && (
+          <div className="mt-4">
+            {!collapsedState && (
+              <p className="px-3 mb-2 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-zinc-500 animate-fadeIn">
+                Shared with you
+              </p>
+            )}
+            <div className="space-y-0.5">
+              {groupData.editor.map((doc) => (
+                <SidebarOption
+                  key={doc.id}
+                  href={`/doc/${doc.id}`}
+                  title={
+                    doc.title ? `${doc.title} · Shared` : "Untitled · Shared"
+                  }
+                  icon={<FileText className="h-4 w-4" />}
+                  isCollapsed={collapsedState}
+                  onNavigate={closeMobileFn}
+                />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Sidebar Footer Component */}

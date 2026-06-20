@@ -34,7 +34,8 @@ function Document({ id }: { id: string }) {
   const [docLoaded, setDocLoaded] = useState(false);
 
   useEffect(() => {
-    fetch(`/api/document/${id}`)
+    // Include credentials so server-side auth (Clerk) receives the cookies
+    fetch(`/api/document/${id}`, { credentials: "include" })
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         if (data) setApiData(data);
