@@ -88,9 +88,27 @@ export function ThemeProvider({
   attribute = "class",
   value,
 }: ThemeProviderProps) {
-  const [theme, setTheme] = React.useState<string>(defaultTheme);
+  const [theme, setThemeState] = React.useState<string>(defaultTheme);
   const [systemTheme, setSystemTheme] = React.useState<"light" | "dark">(
     "light",
+  );
+
+  // Wrapper around setThemeState that also persists to localStorage
+  const setTheme = React.useCallback(
+    (newTheme: string | ((prev: string) => string)) => {
+      const resolvedTheme =
+        typeof newTheme === "function" ? newTheme(theme) : newTheme;
+
+      setThemeState(resolvedTheme);
+
+      // Persist to localStorage
+      try {
+        window.localStorage.setItem(storageKey, resolvedTheme);
+      } catch {
+        // ignore localStorage failures
+      }
+    },
+    [theme, storageKey],
   );
 
   React.useEffect(() => {
@@ -109,21 +127,21 @@ export function ThemeProvider({
 
   React.useEffect(() => {
     if (forcedTheme) {
-      setTheme(forcedTheme);
+      setThemeState(forcedTheme);
       return;
     }
 
     try {
       const stored = window.localStorage.getItem(storageKey);
       if (stored) {
-        setTheme(stored);
+        setThemeState(stored);
         return;
       }
     } catch {
       // ignore localStorage failures
     }
 
-    setTheme(defaultTheme);
+    setThemeState(defaultTheme);
   }, [forcedTheme, storageKey, defaultTheme]);
 
   React.useEffect(() => {
