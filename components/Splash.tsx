@@ -45,8 +45,8 @@ export default function Splash() {
             <div>
               <h1 className="text-4xl font-bold text-white">Welcome</h1>
               <p className="mt-2 max-w-xl text-lg text-white/90">
-                Collaborate in real-time, create documents, and invite teammates.
-                Sign in to save your work or continue as a guest.
+                Collaborate in real-time, create documents, and invite
+                teammates. Sign in to save your work or continue as a guest.
               </p>
 
               <div className="mt-6 flex flex-wrap items-center gap-3">
