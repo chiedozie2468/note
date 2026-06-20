@@ -1,6 +1,7 @@
 import Link from "next/link";
 import NewDocumentButton from "@/components/NewDocumentButton";
 import RecentDocuments from "@/components/RecentDocuments";
+import Splash from "@/components/Splash";
 import { FileText, LayoutDashboard, ListVideo } from "lucide-react";
 import { auth } from "@clerk/nextjs/server";
 
@@ -11,6 +12,7 @@ export default async function Home() {
   if (!userId) {
     return (
       <main className="min-h-screen bg-slate-50 px-4 py-10 sm:px-6 lg:px-8 dark:bg-zinc-950">
+        <Splash />
         <div className="mx-auto max-w-6xl space-y-8">
           <section className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/30 dark:border-zinc-800 dark:bg-zinc-950 dark:shadow-black/20">
             <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
@@ -144,6 +146,7 @@ export default async function Home() {
   // Signed-in users: show activities / personal dashboard (Recent docs + quick links)
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-10 sm:px-6 lg:px-8 dark:bg-zinc-950">
+      <Splash />
       <div className="mx-auto max-w-6xl space-y-6">
         <section className="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
           <div className="flex items-center justify-between">

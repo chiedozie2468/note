@@ -87,7 +87,7 @@ function Document({ id }: { id: string }) {
   }
 
   return (
-    <div className="h-screen w-full flex flex-col bg-linear-to-br from-zinc-50 via-white to-zinc-100 dark:from-[#0a0a0a] dark:via-[#0f0f12] dark:to-black bg-green-500">
+    <div className="h-screen w-full flex flex-col bg-linear-to-br from-zinc-50 via-white to-zinc-100 dark:from-[#0a0a0a] dark:via-[#0f0f12] dark:to-black ">
       {/* TOP BAR */}
       <div className="w-full px-6 py-4 flex justify-center border-b border-black/5 dark:border-white/10 backdrop-blur-md bg-white/60 dark:bg-black/30">
         <form
