@@ -1,17 +1,22 @@
 "use client";
 
+import * as React from "react";
 import Link from "next/link";
 import { useState } from "react";
 import { useUser, SignInButton, UserButton } from "@clerk/nextjs";
 import Breadcrumb from "./breadcrumb";
-import { useTheme } from "next-themes";
+import { useTheme } from "@/components/ThemeProvider";
 import { SunIcon, MoonIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Header() {
   const { user, isSignedIn } = useUser();
-  const [mounted] = useState<boolean>(() => typeof window !== "undefined");
+  const [mounted, setMounted] = useState(false);
   const { resolvedTheme, setTheme } = useTheme();
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-zinc-800 bg-white/90 dark:bg-zinc-950/90 backdrop-blur">

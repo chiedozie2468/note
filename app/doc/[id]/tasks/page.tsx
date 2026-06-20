@@ -12,9 +12,9 @@ function formatDueText(dueAt: string | null) {
 export default async function DocumentTasksPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const { id } = params;
+  const { id } = await params;
   // guard against invalid or missing id (sometimes the route can receive 'undefined')
   if (!id || id === "undefined") {
     return (

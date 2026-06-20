@@ -13,7 +13,7 @@ import useUserOwn from "@/lib/userOwn";
 import DeleteDocument from "./DeleteDocument";
 import InviteUser from "./InviteUser";
 import LeaveDocument from "./LeaveDocument";
-import { useTheme } from "next-themes";
+import { useTheme } from "@/components/ThemeProvider";
 import { Pencil, ListVideo } from "lucide-react";
 import { updateDocumentTitle } from "@/actions/actions";
 import ShareDocument from "./ShareDocument";

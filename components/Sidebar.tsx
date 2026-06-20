@@ -5,7 +5,12 @@ import React, { useMemo } from "react";
 import NewDocumentButton from "./NewDocumentButton";
 import CreateTeamDocumentButton from "./CreateTeamDocumentButton";
 import { useCollection } from "react-firebase-hooks/firestore";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import {
   LayoutDashboard,
   FileText,
@@ -174,6 +179,7 @@ export default function Sidebar() {
           </SheetTrigger>
 
           <SheetContent side="left" className="p-0 w-80">
+            <SheetTitle className="sr-only">Navigation</SheetTitle>
             {sidebarInner}
           </SheetContent>
         </Sheet>
