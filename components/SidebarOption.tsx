@@ -11,10 +11,12 @@ function SidebarOption({
   href,
   id,
   title,
+  onNavigate,
 }: {
   href: string;
   id: string;
   title?: string;
+  onNavigate?: () => void;
 }) {
   const pathname = usePathname();
   const isActive = href.includes(pathname) && pathname !== "/";
@@ -22,6 +24,7 @@ function SidebarOption({
   return (
     <Link
       href={href}
+      onClick={onNavigate}
       className={`
         block
         px-4 py-3
