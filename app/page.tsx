@@ -1,29 +1,39 @@
 import Link from "next/link";
+import MyNotes from "@/components/MyNotes";
 import NewDocumentButton from "@/components/NewDocumentButton";
+import RecentFolders from "@/components/RecentFolders";
 import RecentDocuments from "@/components/RecentDocuments";
-import Splash from "@/components/Splash";
-import { FileText, LayoutDashboard, ListVideo } from "lucide-react";
+import {
+  FileText,
+  LayoutDashboard,
+  ListVideo,
+  MoreHorizontal,
+  FolderPlus,
+  Plus,
+  Clock,
+  Edit3,
+} from "lucide-react";
 import { auth } from "@clerk/nextjs/server";
 
 export default async function Home() {
   const { userId } = await auth();
 
-  // If not signed in, show the public landing/home page
+  // 1. PUBLIC LANDING / NOT SIGNED IN VIEW
   if (!userId) {
     return (
-      <main className="min-h-screen bg-slate-50 px-4 py-10 sm:px-6 lg:px-8 dark:bg-zinc-950">
-        <Splash />
+      <main className="min-h-screen bg-[#f5f7fb] text-[#0f172a] px-4 py-10 sm:px-6 lg:px-8 dark:bg-zinc-950">
         <div className="mx-auto max-w-6xl space-y-8">
-          <section className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/30 dark:border-zinc-800 dark:bg-zinc-950 dark:shadow-black/20">
+          {/* Main Public Hero Section */}
+          <section className="rounded-[2rem] bg-gradient-to-r from-cyan-500 to-blue-600 p-8 shadow-xl shadow-cyan-500/30">
             <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
               <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.25em] text-cyan-600 dark:text-cyan-300">
+                <p className="text-sm font-semibold uppercase tracking-[0.25em] text-cyan-100">
                   Workspace dashboard
                 </p>
-                <h1 className="mt-3 text-4xl font-semibold text-slate-900 dark:text-white">
+                <h1 className="mt-3 text-4xl font-semibold text-white">
                   Your notes, tasks, and shared workspace.
                 </h1>
-                <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-600 dark:text-slate-400">
+                <p className="mt-4 max-w-2xl text-sm leading-7 text-cyan-100/90">
                   Create a new document, manage assigned tasks, and keep your
                   workspace organized from one clean landing page.
                 </p>
@@ -31,25 +41,28 @@ export default async function Home() {
 
               <NewDocumentButton
                 size="lg"
-                className="inline-flex items-center justify-center rounded-3xl bg-cyan-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-cyan-500/20 hover:bg-cyan-500"
+                className="inline-flex items-center justify-center rounded-3xl bg-white px-6 py-3 text-sm font-semibold text-cyan-700 shadow-lg shadow-cyan-500/20 hover:bg-slate-100 transition-all active:scale-95"
               >
                 Create New Document
               </NewDocumentButton>
             </div>
           </section>
 
-          <section className="grid gap-6 lg:grid-cols-3">
+          {/* Public Features Quick Nav */}
+          <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <Link
               href="/create"
-              className="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm transition hover:border-slate-300 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-950"
+              className="group rounded-[1.75rem] border border-slate-200 bg-blue-100 p-6 shadow-sm transition-all hover:border-slate-300 hover:shadow-md"
             >
-              <div className="flex items-center gap-3">
-                <LayoutDashboard className="h-6 w-6 text-cyan-600" />
+              <div className="flex items-center gap-4">
+                <div className="rounded-xl bg-blue-200 p-3 text-blue-600 group-hover:scale-105 transition-transform">
+                  <LayoutDashboard className="h-6 w-6" />
+                </div>
                 <div>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                  <p className="text-xs font-medium text-[#0f172a] uppercase tracking-wider">
                     Create
                   </p>
-                  <p className="mt-2 text-lg font-semibold text-slate-900 dark:text-white">
+                  <p className="mt-1 text-lg font-semibold text-[#0f172a]">
                     Start a new document
                   </p>
                 </div>
@@ -58,15 +71,17 @@ export default async function Home() {
 
             <Link
               href="/tasks"
-              className="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm transition hover:border-slate-300 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-950"
+              className="group rounded-[1.75rem] border border-slate-200 bg-pink-100 p-6 shadow-sm transition-all hover:border-slate-300 hover:shadow-md"
             >
-              <div className="flex items-center gap-3">
-                <ListVideo className="h-6 w-6 text-cyan-600" />
+              <div className="flex items-center gap-4">
+                <div className="rounded-xl bg-pink-200 p-3 text-pink-600 group-hover:scale-105 transition-transform">
+                  <ListVideo className="h-6 w-6" />
+                </div>
                 <div>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                  <p className="text-xs font-medium text-[#0f172a] uppercase tracking-wider">
                     Tasks
                   </p>
-                  <p className="mt-2 text-lg font-semibold text-slate-900 dark:text-white">
+                  <p className="mt-1 text-lg font-semibold text-[#0f172a]">
                     Go to task board
                   </p>
                 </div>
@@ -75,15 +90,17 @@ export default async function Home() {
 
             <Link
               href="/profile"
-              className="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm transition hover:border-slate-300 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-950"
+              className="group rounded-[1.75rem] border border-slate-200 bg-yellow-100 p-6 shadow-sm transition-all hover:border-slate-300 hover:shadow-md"
             >
-              <div className="flex items-center gap-3">
-                <FileText className="h-6 w-6 text-cyan-600" />
+              <div className="flex items-center gap-4">
+                <div className="rounded-xl bg-yellow-200 p-3 text-amber-600 group-hover:scale-105 transition-transform">
+                  <FileText className="h-6 w-6" />
+                </div>
                 <div>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                  <p className="text-xs font-medium text-[#0f172a] uppercase tracking-wider">
                     Profile
                   </p>
-                  <p className="mt-2 text-lg font-semibold text-slate-900 dark:text-white">
+                  <p className="mt-1 text-lg font-semibold text-[#0f172a]">
                     Manage settings
                   </p>
                 </div>
@@ -91,8 +108,9 @@ export default async function Home() {
             </Link>
           </section>
 
+          {/* Public Data Summary Split Layout */}
           <section className="grid gap-6 lg:grid-cols-[1.4fr_0.8fr]">
-            <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+            <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/30">
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
@@ -104,7 +122,7 @@ export default async function Home() {
                 </div>
                 <Link
                   href="/create"
-                  className="text-sm font-semibold text-cyan-600 hover:text-cyan-500"
+                  className="text-sm font-semibold text-cyan-600 hover:text-cyan-500 dark:text-cyan-400"
                 >
                   New document
                 </Link>
@@ -114,24 +132,24 @@ export default async function Home() {
               </div>
             </div>
 
-            <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+            <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/30">
               <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
                 Workspace summary
               </h2>
               <div className="mt-6 grid gap-4">
-                <div className="rounded-3xl bg-slate-50 p-5 dark:bg-zinc-900">
-                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                <div className="rounded-2xl bg-slate-50 p-5 dark:bg-zinc-900/60">
+                  <p className="text-xs font-medium text-slate-400 uppercase tracking-wider">
                     Documents
                   </p>
-                  <p className="mt-2 text-2xl font-semibold text-slate-900 dark:text-white">
+                  <p className="mt-1 text-xl font-semibold text-slate-900 dark:text-white">
                     Quick access
                   </p>
                 </div>
-                <div className="rounded-3xl bg-slate-50 p-5 dark:bg-zinc-900">
-                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                <div className="rounded-2xl bg-slate-50 p-5 dark:bg-zinc-900/60">
+                  <p className="text-xs font-medium text-slate-400 uppercase tracking-wider">
                     Tasks
                   </p>
-                  <p className="mt-2 text-2xl font-semibold text-slate-900 dark:text-white">
+                  <p className="mt-1 text-xl font-semibold text-slate-900 dark:text-white">
                     Manage from Tasks page
                   </p>
                 </div>
@@ -143,59 +161,158 @@ export default async function Home() {
     );
   }
 
-  // Signed-in users: show activities / personal dashboard (Recent docs + quick links)
+  // 2. SIGNED-IN HOMEPAGE VIEW
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-10 sm:px-6 lg:px-8 dark:bg-zinc-950">
-      <Splash />
-      <div className="mx-auto max-w-6xl space-y-6">
-        <section className="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">
-                Your activity
-              </h1>
-              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                Recent updates from your documents and tasks.
-              </p>
+    <main className="min-h-screen bg-[#f5f7fb] text-[#0f172a] px-4 py-8 sm:px-8 lg:px-12 space-y-10 dark:bg-zinc-950">
+      <div className="mx-auto max-w-7xl space-y-10">
+        <RecentFolders />
+
+        {/* SECTION: MY NOTES */}
+        <section className="space-y-4">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="space-y-1">
+              <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
+                My Notes
+              </h2>
+              <div className="flex items-center gap-4 text-xs text-slate-400 font-semibold">
+                <button className="border-b-2 border-slate-900 pb-0.5 text-slate-900 dark:border-white dark:text-white">
+                  Todays
+                </button>
+                <button className="hover:text-slate-600 dark:hover:text-zinc-300 transition-colors">
+                  This Week
+                </button>
+                <button className="hover:text-slate-600 dark:hover:text-zinc-300 transition-colors">
+                  This Month
+                </button>
+              </div>
             </div>
 
-            <div className="flex items-center gap-3">
-              <Link
-                href="/tasks"
-                className="text-sm font-medium text-slate-700 dark:text-slate-300"
-              >
-                View Tasks
-              </Link>
-              <NewDocumentButton />
+            {/* Note Interface Carousel / Pagination Metrics */}
+            <div className="flex items-center gap-2 text-xs font-bold text-slate-400">
+              <button className="hover:text-slate-600 dark:hover:text-zinc-300 transition-colors">
+                ◀
+              </button>
+              <span className="text-slate-800 text-[11px] font-semibold dark:text-zinc-300">
+                December 2021
+              </span>
+              <button className="hover:text-slate-600 dark:hover:text-zinc-300 transition-colors">
+                ▶
+              </button>
+            </div>
+          </div>
+
+          {/* Notes Workspace Masonry/Grid Matrix */}
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {/* Note Card 1: Warm Yellow */}
+            <div className="flex flex-col justify-between rounded-2xl bg-[#E8E288] p-5 text-slate-800 shadow-sm transition-transform hover:-translate-y-0.5">
+              <div>
+                <div className="flex items-center justify-between text-[10px] font-semibold opacity-60">
+                  <span>12/12/2021</span>
+                  <Edit3 className="h-3.5 w-3.5" />
+                </div>
+                <h3 className="mt-3 text-sm font-bold tracking-tight">
+                  Mid test exam
+                </h3>
+                <p className="mt-2 text-xs leading-relaxed opacity-75 line-clamp-5">
+                  Ultrices viverra odio congue lecos felis, libero egestas nunc
+                  sagi are masa, elit ornare eget sem veib in ulum. In augue
+                  cursus of adipicing felis, diam volutpat mauris, id and
+                </p>
+              </div>
+              <div className="mt-6 flex items-center gap-1.5 text-[10px] font-bold opacity-60">
+                <Clock className="h-3 w-3" />
+                <span>10:30 PM, Monday</span>
+              </div>
+            </div>
+
+            {/* Note Card 2: Salmon / Pastel Red */}
+            <div className="flex flex-col justify-between rounded-2xl bg-[#F4A2A2] p-5 text-slate-800 shadow-sm transition-transform hover:-translate-y-0.5">
+              <div>
+                <div className="flex items-center justify-between text-[10px] font-semibold opacity-60">
+                  <span>12/12/2021</span>
+                  <Edit3 className="h-3.5 w-3.5" />
+                </div>
+                <h3 className="mt-3 text-sm font-bold tracking-tight">
+                  Mid test exam
+                </h3>
+                <p className="mt-2 text-xs leading-relaxed opacity-75 line-clamp-5">
+                  Ultrices viverra odio congue lecos felis, libero egestas nunc
+                  sagi are masa, elit ornare eget sem veib in ulum. In augue
+                  cursus of adipicing felis, diam volutpat mauris, id and
+                </p>
+              </div>
+              <div className="mt-6 flex items-center gap-1.5 text-[10px] font-bold opacity-60">
+                <Clock className="h-3 w-3" />
+                <span>10:30 PM, Monday</span>
+              </div>
+            </div>
+
+            {/* Note Card 3: Deep Sky Blue */}
+            <div className="flex flex-col justify-between rounded-2xl bg-[#6BB5DB] p-5 text-slate-800 shadow-sm transition-transform hover:-translate-y-0.5">
+              <div>
+                <div className="flex items-center justify-between text-[10px] font-semibold opacity-60">
+                  <span>12/12/2021</span>
+                  <Edit3 className="h-3.5 w-3.5" />
+                </div>
+                <h3 className="mt-3 text-sm font-bold tracking-tight">
+                  Jonas's notes
+                </h3>
+                <p className="mt-2 text-xs leading-relaxed opacity-75 line-clamp-5">
+                  Rokity viverra odio congue lecos felis, libero egestas nunc
+                  sagi are masa, elit ornare eget sem veib in ulum.
+                </p>
+              </div>
+              <div className="mt-6 flex items-center gap-1.5 text-[10px] font-bold opacity-60">
+                <Clock className="h-3 w-3" />
+                <span>04:30 PM, Sunday</span>
+              </div>
+            </div>
+
+            {/* Active Wrapper Container for Custom New Document Form Trigger */}
+            <div className="flex items-center justify-center">
+              <NewDocumentButton className="w-full h-full block">
+                <div className="flex h-full w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-white/40 py-12 px-5 text-center transition-all hover:border-slate-300 dark:border-zinc-800 dark:bg-zinc-900/20 group">
+                  <div className="rounded-xl bg-slate-900 p-2.5 text-white transition-transform group-hover:scale-110 dark:bg-zinc-800">
+                    <Plus className="h-4 w-4" />
+                  </div>
+                  <span className="mt-3 text-xs font-bold text-slate-800 dark:text-zinc-400">
+                    New Note
+                  </span>
+                </div>
+              </NewDocumentButton>
             </div>
           </div>
         </section>
 
-        <section className="grid gap-6 lg:grid-cols-[1.4fr_0.8fr]">
-          <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-              Recent documents
-            </h2>
-            <div className="mt-4">
-              <RecentDocuments />
+        {/* SECTION: WORKSPACE RECENT COMPONENT PIPELINE */}
+        <section className="pt-6 border-t border-slate-200 dark:border-zinc-900">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-4">
+            <div>
+              <h2 className="text-base font-bold text-slate-900 dark:text-white">
+                Workspace Document Stream
+              </h2>
+              <p className="text-xs text-slate-400 font-medium">
+                Live document data streams matching your verified workspace
+                components.
+              </p>
             </div>
-          </div>
 
-          <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-              Quick actions
-            </h2>
-            <div className="mt-4 flex flex-col gap-3">
-              <Link href="/create" className="text-sm text-cyan-600">
+            {/* Quick Actions Links mapping */}
+            <div className="flex items-center gap-4 text-xs font-semibold text-cyan-600 dark:text-cyan-400">
+              <Link href="/create" className="hover:underline">
                 New document
               </Link>
-              <Link href="/tasks" className="text-sm text-cyan-600">
+              <Link href="/tasks" className="hover:underline">
                 Open tasks
               </Link>
-              <Link href="/profile" className="text-sm text-cyan-600">
+              <Link href="/profile" className="hover:underline">
                 Profile
               </Link>
             </div>
+          </div>
+
+          <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm dark:bg-zinc-900/20 dark:border-zinc-900">
+            <RecentDocuments />
           </div>
         </section>
       </div>
