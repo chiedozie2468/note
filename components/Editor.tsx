@@ -1,13 +1,13 @@
 "use client";
 
 import LiveCursorProvider from "./LiveCursorProvider";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRoom, useSelf } from "@liveblocks/react/suspense";
 import * as Y from "yjs";
 import { LiveblocksYjsProvider } from "@liveblocks/yjs";
 
 import { BlockNoteView } from "@blocknote/shadcn";
-import { useCreateBlockNote } from "@blocknote/react";
+import { BlockNoteEditor } from "@blocknote/core";
 
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/shadcn/style.css";
@@ -23,21 +23,36 @@ interface BlockNoteProps {
 }
 
 function BlockNote({ doc, provider, darkMode, userInfo }: BlockNoteProps) {
-  const editor = useCreateBlockNote(
-    useMemo(
-      () => ({
-        collaboration: {
-          provider: provider as never,
-          fragment: doc.getXmlFragment("document-store"),
-          user: {
-            name: userInfo?.name ?? "Anonymous",
-            color: stringToColor(userInfo?.email ?? "anonymous@example.com"),
-          },
+  const [editor, setEditor] = useState<BlockNoteEditor | null>(null);
+
+  useEffect(() => {
+    if (!provider || !doc || !userInfo) return;
+
+    const createdEditor = BlockNoteEditor.create({
+      collaboration: {
+        provider: provider as never,
+        fragment: doc.getXmlFragment("document-store"),
+        user: {
+          name: userInfo?.name ?? "Anonymous",
+          color: stringToColor(userInfo?.email ?? "anonymous@example.com"),
         },
-      }),
-      [provider, doc, userInfo?.email, userInfo?.name],
-    ),
-  );
+      },
+    });
+
+    setEditor(createdEditor);
+
+    return () => {
+      createdEditor._tiptapEditor.destroy();
+    };
+  }, [provider, doc, userInfo?.email, userInfo?.name]);
+
+  if (!editor) {
+    return (
+      <div className="h-full w-full flex items-center justify-center">
+        <div className="text-slate-400">Loading editor...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-full w-full overflow-y-auto px-8 py-10 md:px-16 md:py-12">
@@ -58,10 +73,14 @@ export default function Editor({ darkMode }: { darkMode: boolean }) {
 
   const [doc, setDoc] = useState<Y.Doc | null>(null);
   const [provider, setProvider] = useState<LiveblocksYjsProvider | null>(null);
-  const [renderBlockNote, setRenderBlockNote] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  // Track client mount to avoid render-phase editor creation during hydration
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Initialize Yjs doc and provider
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!room) return;
 
@@ -79,18 +98,12 @@ export default function Editor({ darkMode }: { darkMode: boolean }) {
     };
   }, [room]);
 
-  // Delay BlockNote rendering to avoid render-phase state updates
-  useEffect(() => {
-    if (doc && provider && userInfo && !renderBlockNote) {
-      // Defer to next animation frame to ensure DOM paint and avoid
-      // render-phase state updates in sibling components (e.g. Avatars)
-      const raf = requestAnimationFrame(() => setRenderBlockNote(true));
-      return () => cancelAnimationFrame(raf);
-    }
-  }, [doc, provider, userInfo, renderBlockNote]);
-
-  if (!doc || !provider) {
-    return <div className="h-full w-full" />;
+  if (!doc || !provider || !mounted) {
+    return (
+      <div className="h-full w-full flex items-center justify-center">
+        <div className="text-slate-400">Loading editor...</div>
+      </div>
+    );
   }
 
   return (
@@ -102,18 +115,12 @@ export default function Editor({ darkMode }: { darkMode: boolean }) {
 
           {/* ChatToDocument */}
         </div>
-        {renderBlockNote ? (
-          <BlockNote
-            doc={doc}
-            provider={provider}
-            darkMode={darkMode}
-            userInfo={userInfo}
-          />
-        ) : (
-          <div className="h-full w-full flex items-center justify-center">
-            <div className="text-slate-400">Loading editor...</div>
-          </div>
-        )}
+        <BlockNote
+          doc={doc}
+          provider={provider}
+          darkMode={darkMode}
+          userInfo={userInfo}
+        />
       </div>
     </LiveCursorProvider>
   );

@@ -3,13 +3,19 @@
 import React, { useMemo, useState } from "react";
 
 import { useCollection } from "react-firebase-hooks/firestore";
-import { useUser, UserButton } from "@clerk/nextjs";
+import dynamic from "next/dynamic";
+import { useUser } from "@clerk/nextjs";
 import {
   collectionGroup,
   query,
   where,
   DocumentData,
 } from "firebase/firestore";
+
+const DynamicUserButton = dynamic(
+  () => import("@clerk/nextjs").then((mod) => mod.UserButton),
+  { ssr: false },
+);
 import { db } from "@/firebase";
 import SidebarOption from "./SidebarOption";
 import NewDocumentButton from "./NewDocumentButton";
@@ -43,6 +49,11 @@ export default function Sidebar() {
   const { user } = useUser();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [data, loading, error] = useCollection(
     user?.id
@@ -192,15 +203,19 @@ export default function Sidebar() {
           }`}
         >
           <div className="shrink-0">
-            <UserButton
-              userProfileUrl="/profile"
-              userProfileMode="navigation"
-              appearance={{
-                elements: { userButtonAvatarBox: "h-9 w-9 shadow-sm" },
-              }}
-            />
+            {mounted ? (
+              <DynamicUserButton
+                userProfileUrl="/profile"
+                userProfileMode="navigation"
+                appearance={{
+                  elements: { userButtonAvatarBox: "h-9 w-9 shadow-sm" },
+                }}
+              />
+            ) : (
+              <div className="h-9 w-9 rounded-full bg-slate-200 dark:bg-zinc-800" />
+            )}
           </div>
-          {!collapsedState && (
+          {!collapsedState && mounted && (
             <div className="min-w-0 animate-fadeIn">
               <p className="truncate text-xs font-semibold text-slate-800 dark:text-zinc-200">
                 {user?.fullName || "User Profile"}
