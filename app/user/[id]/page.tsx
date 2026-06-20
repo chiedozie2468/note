@@ -50,7 +50,7 @@ export default function UserProfilePage() {
   }, [userId]);
 
   return (
-    <div className="min-h-screen w-full flex flex-col bg-gradient-to-br from-zinc-50 via-white to-zinc-100 dark:from-[#0a0a0a] dark:via-[#0f0f12] dark:to-black p-4 sm:p-6 md:p-8">
+    <div className="min-h-screen w-full flex flex-col bg-linear-to-br from-zinc-50 via-white to-zinc-100 dark:from-[#0a0a0a] dark:via-[#0f0f12] dark:to-black p-4 sm:p-6 md:p-8">
       {/* Back button */}
       <div className="max-w-2xl w-full mx-auto mb-6">
         <Link href="/">

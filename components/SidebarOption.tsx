@@ -6,7 +6,6 @@ import React from "react";
 
 interface SidebarOptionProps {
   href: string;
-  id: string;
   title?: string;
   icon: React.ReactNode;
   count?: number;
@@ -16,7 +15,6 @@ interface SidebarOptionProps {
 
 export default function SidebarOption({
   href,
-  id,
   title = "Untitled",
   icon,
   count,
@@ -40,7 +38,11 @@ export default function SidebarOption({
     >
       {/* Icon and Text Wrapper */}
       <div className="flex items-center gap-3 min-w-0">
-        <div className={`shrink-0 transition-transform duration-200 group-hover:scale-105 ${isActive ? "text-slate-900 dark:text-zinc-50" : ""}`}>
+        <div
+          className={`shrink-0 transition-transform duration-200 group-hover:scale-105 ${
+            isActive ? "text-slate-900 dark:text-zinc-50" : ""
+          }`}
+        >
           {icon}
         </div>
         {!isCollapsed && (

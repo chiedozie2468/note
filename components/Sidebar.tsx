@@ -1,29 +1,33 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import Link from "next/link";
+
 import { useCollection } from "react-firebase-hooks/firestore";
 import { useUser, UserButton } from "@clerk/nextjs";
-import { collectionGroup, query, where, DocumentData } from "firebase/firestore";
+import {
+  collectionGroup,
+  query,
+  where,
+  DocumentData,
+} from "firebase/firestore";
 import { db } from "@/firebase";
 import SidebarOption from "./SidebarOption";
 import NewDocumentButton from "./NewDocumentButton";
 import CreateTeamDocumentButton from "./CreateTeamDocumentButton";
-import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 import {
-  Inbox,
-  MessageSquare,
-  Download,
-  Tag,
+  CheckSquare,
+  Home,
   FileText,
-  Edit3,
-  Settings,
-  Sliders,
-  Sparkles,
   Menu,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
 } from "lucide-react";
 
 interface RoomDocument extends DocumentData {
@@ -41,53 +45,56 @@ export default function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const [data, loading, error] = useCollection(
-    user?.id ? query(collectionGroup(db, "rooms"), where("userId", "==", user.id)) : null,
+    user?.id
+      ? query(collectionGroup(db, "rooms"), where("userId", "==", user.id))
+      : null,
   );
 
   const groupData = useMemo(() => {
-    if (!data) return { owner: [] as RoomDocument[], editor: [] as RoomDocument[] };
+    if (!data)
+      return { owner: [] as RoomDocument[], editor: [] as RoomDocument[] };
     return data.docs.reduce<{ owner: RoomDocument[]; editor: RoomDocument[] }>(
       (acc, curr) => {
         const roomDoc = curr.data() as RoomDocument;
-        if (roomDoc.role === "owner") acc.owner.push({ id: curr.id, ...roomDoc });
+        if (roomDoc.role === "owner")
+          acc.owner.push({ id: curr.id, ...roomDoc });
         else acc.editor.push({ id: curr.id, ...roomDoc });
         return acc;
       },
-      { owner: [], editor: [] }
+      { owner: [], editor: [] },
     );
   }, [data]);
 
   // Shared inner navigation panel layout
-  const renderNavContent = (collapsedState: boolean, closeMobileFn?: () => void) => (
+  const renderNavContent = (
+    collapsedState: boolean,
+    closeMobileFn?: () => void,
+  ) => (
     <div className="flex h-full flex-col bg-white py-5 dark:bg-zinc-950">
-      
-      {/* Brand Profile Workspace */}
-      <div className={`flex items-center gap-3 px-4 ${collapsedState ? "justify-center" : ""}`}>
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-500 text-white shadow-sm">
-          <Sparkles className="h-5 w-5 fill-current" />
-        </div>
-        {!collapsedState && (
-          <div className="min-w-0 animate-fadeIn">
-            <p className="truncate text-sm font-bold text-slate-900 dark:text-zinc-50">Note Workspace</p>
-            <p className="text-[10px] font-medium uppercase tracking-wider text-slate-400 dark:text-zinc-500">v 1.0</p>
-          </div>
-        )}
-      </div>
-
       {/* Navigation Trees */}
       <div className="flex-1 overflow-y-auto px-3 py-6 space-y-6">
-        {/* Mail Segment */}
+        {/* Navigation Segment */}
         <div>
           {!collapsedState && (
             <p className="px-3 mb-2 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-zinc-500 animate-fadeIn">
-              Mail
+              Navigation
             </p>
           )}
           <div className="space-y-0.5">
-            <SidebarOption id="inbox" href="/inbox" title="Inbox" icon={<Inbox className="h-4 w-4" />} count={14} isCollapsed={collapsedState} onNavigate={closeMobileFn} />
-            <SidebarOption id="messages" href="/messages" title="Messages" icon={<MessageSquare className="h-4 w-4" />} count={9} isCollapsed={collapsedState} onNavigate={closeMobileFn} />
-            <SidebarOption id="downloads" href="/downloads" title="Downloads" icon={<Download className="h-4 w-4" />} count={5} isCollapsed={collapsedState} onNavigate={closeMobileFn} />
-            <SidebarOption id="tags" href="/tags" title="Tags" icon={<Tag className="h-4 w-4" />} isCollapsed={collapsedState} onNavigate={closeMobileFn} />
+            <SidebarOption
+              href="/tasks"
+              title="Tasks"
+              icon={<CheckSquare className="h-4 w-4" />}
+              isCollapsed={collapsedState}
+              onNavigate={closeMobileFn}
+            />
+            <SidebarOption
+              href="/"
+              title="Home"
+              icon={<Home className="h-4 w-4" />}
+              isCollapsed={collapsedState}
+              onNavigate={closeMobileFn}
+            />
           </div>
         </div>
 
@@ -99,8 +106,13 @@ export default function Sidebar() {
             </p>
           )}
           <div className="space-y-0.5">
-            <SidebarOption id="documents" href="/" title="Documents" icon={<FileText className="h-4 w-4" />} isCollapsed={collapsedState} onNavigate={closeMobileFn} />
-            <SidebarOption id="posts" href="/posts" title="Posts" icon={<Edit3 className="h-4 w-4" />} isCollapsed={collapsedState} onNavigate={closeMobileFn} />
+            <SidebarOption
+              href="/"
+              title="Documents"
+              icon={<FileText className="h-4 w-4" />}
+              isCollapsed={collapsedState}
+              onNavigate={closeMobileFn}
+            />
           </div>
         </div>
 
@@ -120,56 +132,58 @@ export default function Sidebar() {
             </p>
           )}
           <div className="space-y-0.5">
-            {error ? (
-              !collapsedState && <p className="px-3 text-xs text-red-500">{error.message}</p>
-            ) : loading ? (
-              !collapsedState && <p className="px-3 text-xs text-slate-400 animate-pulse">Loading...</p>
-            ) : groupData.owner.length === 0 ? (
-              !collapsedState && <p className="px-3 text-xs text-slate-400 italic">Empty</p>
-            ) : (
-              groupData.owner.map((doc) => (
-                <SidebarOption
-                  key={doc.id}
-                  id={doc.id!}
-                  href={`/doc/${doc.id}`}
-                  title={doc.title}
-                  icon={<FileText className="h-4 w-4" />}
-                  isCollapsed={collapsedState}
-                  onNavigate={closeMobileFn}
-                />
-              ))
-            )}
-          </div>
-        </div>
-
-        {/* Account Segment */}
-        <div>
-          {!collapsedState && (
-            <p className="px-3 mb-2 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-zinc-500 animate-fadeIn">
-              Account
-            </p>
-          )}
-          <div className="space-y-0.5">
-            <SidebarOption id="settings" href="/settings" title="Settings" icon={<Settings className="h-4 w-4" />} isCollapsed={collapsedState} onNavigate={closeMobileFn} />
-            <SidebarOption id="manage" href="/profile" title="Manage" icon={<Sliders className="h-4 w-4" />} count={2} isCollapsed={collapsedState} onNavigate={closeMobileFn} />
+            {error
+              ? !collapsedState && (
+                  <p className="px-3 text-xs text-red-500">{error.message}</p>
+                )
+              : loading
+              ? !collapsedState && (
+                  <p className="px-3 text-xs text-slate-400 animate-pulse">
+                    Loading...
+                  </p>
+                )
+              : groupData.owner.length === 0
+              ? !collapsedState && (
+                  <p className="px-3 text-xs text-slate-400 italic">Empty</p>
+                )
+              : groupData.owner.map((doc) => (
+                  <SidebarOption
+                    key={doc.id}
+                    href={`/doc/${doc.id}`}
+                    title={doc.title}
+                    icon={<FileText className="h-4 w-4" />}
+                    isCollapsed={collapsedState}
+                    onNavigate={closeMobileFn}
+                  />
+                ))}
           </div>
         </div>
       </div>
 
       {/* Sidebar Footer Component */}
       <div className="mt-auto border-t border-slate-100 p-3 dark:border-zinc-900">
-        <div className={`flex items-center gap-3 ${collapsedState ? "justify-center" : "px-1"}`}>
+        <div
+          className={`flex items-center gap-3 ${
+            collapsedState ? "justify-center" : "px-1"
+          }`}
+        >
           <div className="shrink-0">
             <UserButton
               userProfileUrl="/profile"
               userProfileMode="navigation"
-              appearance={{ elements: { userButtonAvatarBox: "h-9 w-9 shadow-sm" } }}
+              appearance={{
+                elements: { userButtonAvatarBox: "h-9 w-9 shadow-sm" },
+              }}
             />
           </div>
           {!collapsedState && (
             <div className="min-w-0 animate-fadeIn">
-              <p className="truncate text-xs font-semibold text-slate-800 dark:text-zinc-200">{user?.fullName || "User Profile"}</p>
-              <p className="truncate text-[10px] text-slate-400 dark:text-zinc-500">{user?.primaryEmailAddress?.emailAddress}</p>
+              <p className="truncate text-xs font-semibold text-slate-800 dark:text-zinc-200">
+                {user?.fullName || "User Profile"}
+              </p>
+              <p className="truncate text-[10px] text-slate-400 dark:text-zinc-500">
+                {user?.primaryEmailAddress?.emailAddress}
+              </p>
             </div>
           )}
         </div>
@@ -198,7 +212,7 @@ export default function Sidebar() {
       </div>
 
       {/* 2. Big Desktop Screen Node - Supports expanding and collapsing */}
-      <aside 
+      <aside
         className={`hidden md:flex flex-col h-screen sticky top-0 left-0 border-r border-slate-100 bg-white transition-all duration-300 dark:border-zinc-900 dark:bg-zinc-950 group/sidebar ${
           isCollapsed ? "w-20" : "w-64 lg:w-72"
         }`}
@@ -209,7 +223,11 @@ export default function Sidebar() {
           className="absolute -right-3 top-7 z-50 flex h-6 w-6 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm opacity-0 group-hover/sidebar:opacity-100 transition-all duration-200 hover:bg-slate-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400"
           title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
         >
-          {isCollapsed ? <ChevronRight className="h-3.5 w-3.5" /> : <ChevronLeft className="h-3.5 w-3.5" />}
+          {isCollapsed ? (
+            <ChevronRight className="h-3.5 w-3.5" />
+          ) : (
+            <ChevronLeft className="h-3.5 w-3.5" />
+          )}
         </button>
 
         {renderNavContent(isCollapsed)}

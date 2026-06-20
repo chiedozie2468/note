@@ -37,6 +37,7 @@ export default function CreateTeamDocumentButton({
       disabled={isPending}
       className={className}
       variant="outline"
+     
     >
       {isPending ? "Creating..." : "Create with team"}
     </Button>

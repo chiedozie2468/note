@@ -15,9 +15,14 @@ import "@blocknote/shadcn/style.css";
 import stringToColor from "@/lib/stringToColor";
 import TranslateDocument from "./TranslateDocument";
 
-function BlockNote({ doc, provider, darkMode }: any) {
-  const userInfo = useSelf((me) => me.info);
+interface BlockNoteProps {
+  doc: Y.Doc;
+  provider: LiveblocksYjsProvider;
+  darkMode: boolean;
+  userInfo: { name?: string; email?: string } | null;
+}
 
+function BlockNote({ doc, provider, darkMode, userInfo }: BlockNoteProps) {
   const editor = useCreateBlockNote(
     useMemo(
       () => ({
@@ -47,26 +52,41 @@ function BlockNote({ doc, provider, darkMode }: any) {
   );
 }
 
-export default function Editor({ darkMode }: any) {
+export default function Editor({ darkMode }: { darkMode: boolean }) {
   const room = useRoom();
+  const userInfo = useSelf((me) => me.info);
 
   const [doc, setDoc] = useState<Y.Doc | null>(null);
   const [provider, setProvider] = useState<LiveblocksYjsProvider | null>(null);
+  const [renderBlockNote, setRenderBlockNote] = useState(false);
 
+  // Initialize Yjs doc and provider
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!room) return;
 
     const yDoc = new Y.Doc();
     const yProvider = new LiveblocksYjsProvider(room, yDoc);
 
-    setDoc(yDoc);
-    setProvider(yProvider);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setDoc(yDoc as any);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setProvider(yProvider as any);
 
     return () => {
       yProvider.destroy();
       yDoc.destroy();
     };
   }, [room]);
+
+  // Delay BlockNote rendering to avoid render-phase state updates
+  useEffect(() => {
+    if (doc && provider && userInfo && !renderBlockNote) {
+      // Defer to next event loop to ensure proper render cycle
+      const timer = setTimeout(() => setRenderBlockNote(true), 0);
+      return () => clearTimeout(timer);
+    }
+  }, [doc, provider, userInfo, renderBlockNote]);
 
   if (!doc || !provider) {
     return <div className="h-full w-full" />;
@@ -81,7 +101,18 @@ export default function Editor({ darkMode }: any) {
 
           {/* ChatToDocument */}
         </div>
-        <BlockNote doc={doc} provider={provider} darkMode={darkMode} />
+        {renderBlockNote ? (
+          <BlockNote
+            doc={doc}
+            provider={provider}
+            darkMode={darkMode}
+            userInfo={userInfo}
+          />
+        ) : (
+          <div className="h-full w-full flex items-center justify-center">
+            <div className="text-slate-400">Loading editor...</div>
+          </div>
+        )}
       </div>
     </LiveCursorProvider>
   );

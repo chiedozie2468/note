@@ -11,16 +11,13 @@ export default function ProfilePage() {
     <div className="min-h-screen w-full flex flex-col bg-linear-to-br from-zinc-50 via-white to-zinc-100 dark:from-[#0a0a0a] dark:via-[#0f0f12] dark:to-black p-4 sm:p-6 md:p-8">
       {/* Back button and title */}
       <div className="max-w-5xl w-full mx-auto mb-6">
-        <Link href="/">
+        <Link href="/" className="inline-flex">
           <Button
-            asChild
             variant="ghost"
             className="gap-2 rounded-xl text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
           >
-            <a>
-              <ArrowLeft className="h-4 w-4" />
-              Back to Workspace
-            </a>
+            <ArrowLeft className="h-4 w-4" />
+            Back to Workspace
           </Button>
         </Link>
       </div>
