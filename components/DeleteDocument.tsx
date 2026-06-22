@@ -14,6 +14,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { Trash2 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { deleteDocument } from "@/actions/actions";
 import { toast } from "sonner";
@@ -30,13 +31,15 @@ export default function DeleteDocument({
   const router = useRouter();
 
   const handleDelete = () => {
-    const roomId = pathname.split("/").pop();
+    // Get the last non-empty segment of the pathname (robust to trailing slashes)
+    const segments = pathname.split("/").filter(Boolean);
+    const roomId = segments.length ? segments[segments.length - 1] : null;
 
     console.log("PATHNAME:", pathname);
     console.log("ROOM ID:", roomId);
 
     if (!roomId) {
-      toast.error("Room ID not found");
+      toast.error("Room ID not found from URL");
       return;
     }
 
@@ -76,28 +79,42 @@ export default function DeleteDocument({
         )}
       </DialogTrigger>
 
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Delete this document?</DialogTitle>
+      <DialogContent className="w-full max-w-md">
+        <div className="flex flex-col items-center justify-center text-center p-6">
+          <div className="flex items-center justify-center mb-4">
+            <div className="rounded-full bg-red-100 dark:bg-red-900/30 p-3">
+              <Trash2 className="h-6 w-6 text-red-600 dark:text-red-400" />
+            </div>
+          </div>
 
-          <DialogDescription>
+          <h3 className="text-zinc-900 dark:text-zinc-50 font-medium tracking-tight text-lg sm:text-xl">
+            Are you sure you want to delete this item?
+          </h3>
+
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-2">
             This will permanently delete the document and remove all users.
-          </DialogDescription>
-        </DialogHeader>
+          </p>
 
-        <DialogFooter>
-          <Button
-            variant="destructive"
-            onClick={handleDelete}
-            disabled={isPending}
-          >
-            {isPending ? "Deleting..." : "Delete"}
-          </Button>
+          <div className="flex items-center justify-center gap-3 w-full mt-6">
+            <DialogClose asChild>
+              <Button
+                variant="outline"
+                className="rounded-xl px-5 h-11 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-800"
+              >
+                No, cancel
+              </Button>
+            </DialogClose>
 
-          <DialogClose asChild>
-            <Button variant="secondary">Cancel</Button>
-          </DialogClose>
-        </DialogFooter>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={isPending}
+              className="rounded-xl px-5 h-11 font-medium shadow-sm"
+            >
+              {isPending ? "Deleting..." : "Yes, I'm sure"}
+            </Button>
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   );

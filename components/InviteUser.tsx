@@ -8,10 +8,12 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogClose,
 } from "@/components/ui/dialog";
 
 import { Button } from "@/components/ui/button";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { UserPlus } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
@@ -42,7 +44,11 @@ export default function InviteUser({
   const [loadingCollaborators, setLoadingCollaborators] = useState(false);
 
   const pathname = usePathname();
-  const roomId = pathname.split("/").pop();
+  // robustly extract last non-empty segment for roomId
+  const roomSegments = pathname?.split("/").filter(Boolean) ?? [];
+  const roomId = roomSegments.length
+    ? roomSegments[roomSegments.length - 1]
+    : null;
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -129,9 +135,7 @@ export default function InviteUser({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         {triggerAsChild ? (
-          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-            Invite User
-          </DropdownMenuItem>
+          <DropdownMenuItem>Invite User</DropdownMenuItem>
         ) : (
           <Button type="button" variant="outline" size="sm">
             Invite User
@@ -139,96 +143,118 @@ export default function InviteUser({
         )}
       </DialogTrigger>
 
-      <DialogContent className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 max-w-md w-full">
-        <DialogHeader>
-          <DialogTitle className="text-zinc-900 dark:text-zinc-100">
+      <DialogContent className="w-full max-w-md">
+        <div className="flex flex-col items-center justify-center text-center p-6">
+          <div className="flex items-center justify-center mb-4">
+            <div className="rounded-full bg-sky-100 dark:bg-sky-900/20 p-3">
+              <UserPlus className="h-6 w-6 text-sky-600 dark:text-sky-300" />
+            </div>
+          </div>
+
+          <h3 className="text-zinc-900 dark:text-zinc-50 font-medium tracking-tight text-lg sm:text-xl">
             Invite a user to collaborate
-          </DialogTitle>
-
-          <DialogDescription className="text-zinc-500 dark:text-zinc-400">
-            Enter the user's email address.
-          </DialogDescription>
-        </DialogHeader>
-
-        <form onSubmit={handleInvite} className="flex gap-2 mb-4">
-          <Input
-            type="email"
-            placeholder="Enter email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="flex-1"
-          />
-
-          <Button type="submit" disabled={!email || isPending}>
-            {isPending ? "Inviting..." : "Invite"}
-          </Button>
-        </form>
-
-        {/* Collaborators List */}
-        <div className="mt-4 border-t border-zinc-200 dark:border-zinc-800 pt-4">
-          <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-3">
-            Collaborators
           </h3>
 
-          {loadingCollaborators ? (
-            <div className="flex items-center justify-center py-4">
-              <span className="text-sm text-zinc-500 dark:text-zinc-400">
-                Loading collaborators...
-              </span>
-            </div>
-          ) : collaborators.length === 0 ? (
-            <div className="py-2">
-              <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                No other collaborators yet.
-              </span>
-            </div>
-          ) : (
-            <div className="space-y-3 max-h-48 overflow-y-auto pr-1">
-              {collaborators.map((c) => (
-                <div
-                  key={c.userId}
-                  className="flex items-center justify-between gap-3 text-sm p-1.5 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
-                >
-                  <div className="flex items-center gap-2 overflow-hidden">
-                    {c.avatar ? (
-                      <img
-                        src={c.avatar}
-                        alt={c.name}
-                        className="h-7 w-7 rounded-full object-cover border border-zinc-200 dark:border-zinc-700"
-                      />
-                    ) : (
-                      <div className="h-7 w-7 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-600 dark:text-zinc-400">
-                        {c.name.charAt(0).toUpperCase()}
-                      </div>
-                    )}
-                    <div className="flex flex-col min-w-0">
-                      <span className="font-medium text-zinc-900 dark:text-zinc-100 truncate">
-                        {c.name}
-                      </span>
-                      <span className="text-xs text-zinc-500 dark:text-zinc-400 truncate">
-                        {c.email}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    <span className="text-xs font-semibold px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 capitalize">
-                      {c.role}
-                    </span>
-                    {c.role === "editor" && (
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleRemoveCollaborator(c.userId)}
-                        className="h-7 text-xs text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/20"
-                      >
-                        Remove
-                      </Button>
-                    )}
-                  </div>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-2">
+            Enter the user's email address.
+          </p>
+
+          <form onSubmit={handleInvite} className="flex gap-2 mt-4 w-full">
+            <Input
+              type="email"
+              placeholder="Enter email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="flex-1"
+            />
+
+            <Button
+              type="submit"
+              disabled={!email || isPending}
+              className="rounded-xl px-5 h-11 font-medium shadow-sm"
+            >
+              {isPending ? "Inviting..." : "Invite"}
+            </Button>
+          </form>
+
+          <div className="mt-4 w-full">
+            <div className="mt-4 border-t border-zinc-200 dark:border-zinc-800 pt-4">
+              <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-3">
+                Collaborators
+              </h3>
+
+              {loadingCollaborators ? (
+                <div className="flex items-center justify-center py-4">
+                  <span className="text-sm text-zinc-500 dark:text-zinc-400">
+                    Loading collaborators...
+                  </span>
                 </div>
-              ))}
+              ) : collaborators.length === 0 ? (
+                <div className="py-2">
+                  <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                    No other collaborators yet.
+                  </span>
+                </div>
+              ) : (
+                <div className="space-y-3 max-h-48 overflow-y-auto pr-1">
+                  {collaborators.map((c) => (
+                    <div
+                      key={c.userId}
+                      className="flex items-center justify-between gap-3 text-sm p-1.5 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
+                    >
+                      <div className="flex items-center gap-2 overflow-hidden">
+                        {c.avatar ? (
+                          <img
+                            src={c.avatar}
+                            alt={c.name}
+                            className="h-7 w-7 rounded-full object-cover border border-zinc-200 dark:border-zinc-700"
+                          />
+                        ) : (
+                          <div className="h-7 w-7 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-600 dark:text-zinc-400">
+                            {c.name.charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                        <div className="flex flex-col min-w-0">
+                          <span className="font-medium text-zinc-900 dark:text-zinc-100 truncate">
+                            {c.name}
+                          </span>
+                          <span className="text-xs text-zinc-500 dark:text-zinc-400 truncate">
+                            {c.email}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <span className="text-xs font-semibold px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 capitalize">
+                          {c.role}
+                        </span>
+                        {c.role === "editor" && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleRemoveCollaborator(c.userId)}
+                            className="h-7 text-xs text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/20"
+                          >
+                            Remove
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-          )}
+          </div>
+
+          <div className="flex items-center justify-center gap-3 w-full mt-6">
+            <DialogClose asChild>
+              <Button
+                variant="outline"
+                className="rounded-xl px-5 h-11 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-800"
+              >
+                Cancel
+              </Button>
+            </DialogClose>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

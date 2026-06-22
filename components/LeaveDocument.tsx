@@ -14,10 +14,10 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { LogOut } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { leaveDocument } from "@/actions/actions";
 import { toast } from "sonner";
-import { LogOut } from "lucide-react";
 
 export default function LeaveDocument({
   triggerAsChild,
@@ -28,13 +28,13 @@ export default function LeaveDocument({
   const [isPending, startTransition] = useTransition();
 
   const pathname = usePathname();
+  const segments = pathname.split("/").filter(Boolean);
+  const roomId = segments.length ? segments[segments.length - 1] : null;
   const router = useRouter();
 
   const handleLeave = () => {
-    const roomId = pathname.split("/").pop();
-
     if (!roomId) {
-      toast.error("Room ID not found");
+      toast.error("Room ID not found from URL");
       return;
     }
 
@@ -76,35 +76,43 @@ export default function LeaveDocument({
         )}
       </DialogTrigger>
 
-      <DialogContent className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
-        <DialogHeader>
-          <DialogTitle className="text-zinc-900 dark:text-zinc-100">
+      <DialogContent className="w-full max-w-md">
+        <div className="flex flex-col items-center justify-center text-center p-6">
+          <div className="flex items-center justify-center mb-4">
+            <div className="rounded-full bg-orange-100 dark:bg-orange-900/20 p-3">
+              <LogOut className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+            </div>
+          </div>
+
+          <h3 className="text-zinc-900 dark:text-zinc-50 font-medium tracking-tight text-lg sm:text-xl">
             Leave this document?
-          </DialogTitle>
-          <DialogDescription className="text-zinc-500 dark:text-zinc-400">
+          </h3>
+
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-2">
             You will lose access to this document and it will be removed from
             your sidebar. You will need to be re-invited to access it again.
-          </DialogDescription>
-        </DialogHeader>
+          </p>
 
-        <DialogFooter className="gap-2">
-          <Button
-            variant="destructive"
-            onClick={handleLeave}
-            disabled={isPending}
-          >
-            {isPending ? "Leaving..." : "Leave"}
-          </Button>
+          <div className="flex items-center justify-center gap-3 w-full mt-6">
+            <DialogClose asChild>
+              <Button
+                variant="outline"
+                className="rounded-xl px-5 h-11 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-800"
+              >
+                Cancel
+              </Button>
+            </DialogClose>
 
-          <DialogClose asChild>
             <Button
-              variant="secondary"
-              className="dark:bg-zinc-800 dark:hover:bg-zinc-700"
+              variant="destructive"
+              onClick={handleLeave}
+              disabled={isPending}
+              className="rounded-xl px-5 h-11 font-medium shadow-sm"
             >
-              Cancel
+              {isPending ? "Leaving..." : "Leave"}
             </Button>
-          </DialogClose>
-        </DialogFooter>
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   );
