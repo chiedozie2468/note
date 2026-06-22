@@ -204,9 +204,46 @@ export default function MyNotes() {
           {error}
         </div>
       ) : filteredDocs.length === 0 ? (
-        <div className="rounded-3xl bg-slate-50 p-6 text-center text-slate-500 shadow-sm dark:bg-zinc-950/40 dark:text-slate-400">
-          No documents found for this time frame.
-        </div>
+        // Render provided sample documents when there are no real docs
+        <>
+          <style jsx>{`
+            .hide-scroll::-webkit-scrollbar{ display: none; }
+            .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+          `}</style>
+
+          <div className="overflow-x-auto hide-scroll -mx-6 px-6 sm:mx-0 sm:px-0">
+            <div className="flex gap-5 sm:grid sm:grid-cols-2 lg:grid-cols-3">
+              {[
+                { id: "XgLp33CJdDZFjOI0HR0D", title: "New Document", date: new Date("2026-06-20"), bg: "bg-blue-100", sharedBy: null },
+                { id: "lsXegTnmLwfbEGuSMuz8", title: "New Document", date: new Date("2026-06-20"), bg: "bg-pink-100", sharedBy: null },
+                { id: "Ehz4dLKQjDhTHAGoNUfH", title: "New Document", date: new Date("2026-06-20"), bg: "bg-yellow-100", sharedBy: null },
+                { id: "yJoPmdrGvAW1rMvBHtls", title: "Shared Document", date: new Date("2026-06-18"), bg: "bg-blue-100", sharedBy: "Marie" },
+                { id: "PqaThnZXCF41IpAKd4CT", title: "Shared Document for testing", date: new Date("2026-06-18"), bg: "bg-pink-100", sharedBy: "Sam" },
+                { id: "xegczhJBApHAho1HczJU", title: "Chiedozie file for updating", date: new Date("2026-06-17"), bg: "bg-yellow-100", sharedBy: "Chiedozie" },
+              ].map((d) => (
+                <a
+                  key={d.id}
+                  href={`http://localhost:3000/doc/${d.id}`}
+                  className={`${d.bg} min-w-[260px] sm:min-w-0 group flex flex-col justify-between rounded-[2rem] border border-slate-200 p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md`}
+                >
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#0f172a]">
+                      {d.date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
+                    </p>
+                    <h3 className="mt-4 text-lg font-semibold text-[#0f172a]">{d.title}</h3>
+                    <p className="mt-2 text-sm leading-6 text-[#0f172a] line-clamp-4">
+                      {d.sharedBy ? `Shared by ${d.sharedBy}` : "Open your document to continue editing."}
+                    </p>
+                  </div>
+                  <div className="mt-6 flex items-center justify-between text-[11px] font-semibold uppercase tracking-[0.2em] text-[#0f172a]">
+                    <span>{d.date.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}</span>
+                    <span>{d.date.toLocaleDateString(undefined, { weekday: "long" })}</span>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        </>
       ) : (
         <div className="grid gap-5 lg:grid-cols-3">
           {filteredDocs.slice(0, 3).map((doc) => (

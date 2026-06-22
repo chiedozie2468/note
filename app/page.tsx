@@ -203,81 +203,45 @@ export default async function Home() {
 
           {/* Notes Workspace Masonry/Grid Matrix */}
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {/* Note Card 1: Warm Yellow */}
-            <div className="flex flex-col justify-between rounded-2xl bg-[#E8E288] p-5 text-slate-800 shadow-sm transition-transform hover:-translate-y-0.5">
-              <div>
-                <div className="flex items-center justify-between text-[10px] font-semibold opacity-60">
-                  <span>12/12/2021</span>
-                  <Edit3 className="h-3.5 w-3.5" />
+            {[
+              { id: "XgLp33CJdDZFjOI0HR0D", title: "New Document", date: new Date("2026-06-20"), snippet: "Start writing your first paragraph...", bg: "bg-blue-100", sharedBy: null },
+              { id: "lsXegTnmLwfbEGuSMuz8", title: "New Document", date: new Date("2026-06-20"), snippet: "Outline ideas for chapter one.", bg: "bg-pink-100", sharedBy: null },
+              { id: "Ehz4dLKQjDhTHAGoNUfH", title: "New Document", date: new Date("2026-06-20"), snippet: "Meeting notes and action items.", bg: "bg-yellow-100", sharedBy: null },
+              { id: "yJoPmdrGvAW1rMvBHtls", title: "Shared Document", date: new Date("2026-06-18"), snippet: "Please review the changes I made.", bg: "bg-blue-100", sharedBy: "Marie" },
+              { id: "PqaThnZXCF41IpAKd4CT", title: "Shared Document for testing", date: new Date("2026-06-18"), snippet: "Test notes for QA.", bg: "bg-pink-100", sharedBy: "Sam" },
+              { id: "xegczhJBApHAho1HczJU", title: "Chiedozie file for updating", date: new Date("2026-06-17"), snippet: "Update the report with latest figures.", bg: "bg-yellow-100", sharedBy: "Chiedozie" },
+            ].map((d) => (
+              <Link
+                key={d.id}
+                href={`/doc/${d.id}`}
+                className={`group flex flex-col justify-between rounded-2xl border border-slate-200 ${d.bg} p-5 text-[#0f172a] shadow-sm transition-transform hover:-translate-y-0.5 hover:shadow-md`}
+              >
+                <div>
+                  <div className="flex items-center justify-between text-[10px] font-semibold opacity-80">
+                    <span>{d.date.toLocaleDateString()}</span>
+                    <Edit3 className="h-4 w-4" />
+                  </div>
+                  <h3 className="mt-3 text-sm font-bold tracking-tight">{d.title}</h3>
+                  <p className="mt-2 text-xs leading-relaxed opacity-90 line-clamp-4">{d.snippet}</p>
+                  {d.sharedBy ? (
+                    <p className="mt-2 text-[11px] text-[#0f172a]/80">Shared by {d.sharedBy}</p>
+                  ) : null}
                 </div>
-                <h3 className="mt-3 text-sm font-bold tracking-tight">
-                  Mid test exam
-                </h3>
-                <p className="mt-2 text-xs leading-relaxed opacity-75 line-clamp-5">
-                  Ultrices viverra odio congue lecos felis, libero egestas nunc
-                  sagi are masa, elit ornare eget sem veib in ulum. In augue
-                  cursus of adipicing felis, diam volutpat mauris, id and
-                </p>
-              </div>
-              <div className="mt-6 flex items-center gap-1.5 text-[10px] font-bold opacity-60">
-                <Clock className="h-3 w-3" />
-                <span>10:30 PM, Monday</span>
-              </div>
-            </div>
-
-            {/* Note Card 2: Salmon / Pastel Red */}
-            <div className="flex flex-col justify-between rounded-2xl bg-[#F4A2A2] p-5 text-slate-800 shadow-sm transition-transform hover:-translate-y-0.5">
-              <div>
-                <div className="flex items-center justify-between text-[10px] font-semibold opacity-60">
-                  <span>12/12/2021</span>
-                  <Edit3 className="h-3.5 w-3.5" />
+                <div className="mt-6 flex items-center gap-1.5 text-[10px] font-bold opacity-80">
+                  <Clock className="h-3 w-3" />
+                  <span>{d.date.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })}, {d.date.toLocaleDateString(undefined, { weekday: 'long' })}</span>
                 </div>
-                <h3 className="mt-3 text-sm font-bold tracking-tight">
-                  Mid test exam
-                </h3>
-                <p className="mt-2 text-xs leading-relaxed opacity-75 line-clamp-5">
-                  Ultrices viverra odio congue lecos felis, libero egestas nunc
-                  sagi are masa, elit ornare eget sem veib in ulum. In augue
-                  cursus of adipicing felis, diam volutpat mauris, id and
-                </p>
-              </div>
-              <div className="mt-6 flex items-center gap-1.5 text-[10px] font-bold opacity-60">
-                <Clock className="h-3 w-3" />
-                <span>10:30 PM, Monday</span>
-              </div>
-            </div>
-
-            {/* Note Card 3: Deep Sky Blue */}
-            <div className="flex flex-col justify-between rounded-2xl bg-[#6BB5DB] p-5 text-slate-800 shadow-sm transition-transform hover:-translate-y-0.5">
-              <div>
-                <div className="flex items-center justify-between text-[10px] font-semibold opacity-60">
-                  <span>12/12/2021</span>
-                  <Edit3 className="h-3.5 w-3.5" />
-                </div>
-                <h3 className="mt-3 text-sm font-bold tracking-tight">
-                  Jonas's notes
-                </h3>
-                <p className="mt-2 text-xs leading-relaxed opacity-75 line-clamp-5">
-                  Rokity viverra odio congue lecos felis, libero egestas nunc
-                  sagi are masa, elit ornare eget sem veib in ulum.
-                </p>
-              </div>
-              <div className="mt-6 flex items-center gap-1.5 text-[10px] font-bold opacity-60">
-                <Clock className="h-3 w-3" />
-                <span>04:30 PM, Sunday</span>
-              </div>
-            </div>
+              </Link>
+            ))}
 
             {/* Active Wrapper Container for Custom New Document Form Trigger */}
             <div className="flex items-center justify-center">
               <NewDocumentButton className="w-full h-full block">
-                <div className="flex h-full w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-white/40 py-12 px-5 text-center transition-all hover:border-slate-300 dark:border-zinc-800 dark:bg-zinc-900/20 group">
-                  <div className="rounded-xl bg-slate-900 p-2.5 text-white transition-transform group-hover:scale-110 dark:bg-zinc-800">
+                <div className="flex h-full w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-white/40 py-12 px-5 text-center transition-all hover:border-slate-300 group">
+                  <div className="rounded-xl bg-slate-900 p-2.5 text-white transition-transform group-hover:scale-110">
                     <Plus className="h-4 w-4" />
                   </div>
-                  <span className="mt-3 text-xs font-bold text-slate-800 dark:text-zinc-400">
-                    New Note
-                  </span>
+                  <span className="mt-3 text-xs font-bold text-[#0f172a]">New Note</span>
                 </div>
               </NewDocumentButton>
             </div>
