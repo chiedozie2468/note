@@ -80,6 +80,13 @@ export default function DeleteDocument({
       </DialogTrigger>
 
       <DialogContent className="w-full max-w-md">
+        <DialogHeader>
+          <DialogTitle>Delete document</DialogTitle>
+          <DialogDescription>
+            This action is permanent and will remove the document for all users.
+          </DialogDescription>
+        </DialogHeader>
+
         <div className="flex flex-col items-center justify-center text-center p-6">
           <div className="flex items-center justify-center mb-4">
             <div className="rounded-full bg-red-100 dark:bg-red-900/30 p-3">

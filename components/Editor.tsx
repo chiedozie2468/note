@@ -6,11 +6,9 @@ import { useRoom, useSelf } from "@liveblocks/react/suspense";
 import * as Y from "yjs";
 import { LiveblocksYjsProvider } from "@liveblocks/yjs";
 
-import { BlockNoteView } from "@blocknote/shadcn";
-import { BlockNoteEditor } from "@blocknote/core";
-
-import "@blocknote/core/fonts/inter.css";
-import "@blocknote/shadcn/style.css";
+// Defer importing heavy BlockNote modules and CSS until the editor actually
+// mounts. This reduces initial bundle work and allows the dynamic `Editor`
+// chunk to load faster.
 
 import stringToColor from "@/lib/stringToColor";
 import TranslateDocument from "./TranslateDocument";
@@ -23,30 +21,57 @@ interface BlockNoteProps {
 }
 
 function BlockNote({ doc, provider, darkMode, userInfo }: BlockNoteProps) {
-  const [editor, setEditor] = useState<BlockNoteEditor | null>(null);
+  const [editor, setEditor] = useState<any | null>(null);
+  const [BlockNoteViewComp, setBlockNoteViewComp] = useState<any | null>(null);
 
   useEffect(() => {
-    if (!provider || !doc || !userInfo) return;
+    let mounted = true;
+    let createdEditor: any | null = null;
 
-    const createdEditor = BlockNoteEditor.create({
-      collaboration: {
-        provider: provider as never,
-        fragment: doc.getXmlFragment("document-store"),
-        user: {
-          name: userInfo?.name ?? "Anonymous",
-          color: stringToColor(userInfo?.email ?? "anonymous@example.com"),
+    async function init() {
+      if (!provider || !doc || !userInfo) return;
+
+      // Dynamically import BlockNote modules and styles.
+      const [{ BlockNoteEditor }, { BlockNoteView }] = await Promise.all([
+        import("@blocknote/core"),
+        import("@blocknote/shadcn"),
+        // load CSS in parallel
+        import("@blocknote/core/fonts/inter.css").catch(() => {}),
+        import("@blocknote/shadcn/style.css").catch(() => {}),
+      ] as any);
+
+      if (!mounted) return;
+
+      // create editor instance
+      createdEditor = (BlockNoteEditor as any).create({
+        collaboration: {
+          provider: provider as any,
+          fragment: doc.getXmlFragment("document-store"),
+          user: {
+            name: userInfo?.name ?? "Anonymous",
+            color: stringToColor(userInfo?.email ?? "anonymous@example.com"),
+          },
         },
-      },
-    });
+      });
 
-    setEditor(createdEditor);
+      setBlockNoteViewComp(() => BlockNoteView);
+      // small non-critical update scheduled via rAF
+      requestAnimationFrame(() => setEditor(createdEditor));
+    }
+
+    init();
 
     return () => {
-      createdEditor._tiptapEditor.destroy();
+      mounted = false;
+      try {
+        createdEditor?._tiptapEditor?.destroy?.();
+      } catch (e) {
+        // ignore
+      }
     };
   }, [provider, doc, userInfo?.email, userInfo?.name]);
 
-  if (!editor) {
+  if (!editor || !BlockNoteViewComp) {
     return (
       <div className="h-full w-full flex items-center justify-center py-20">
         <div className="text-zinc-400 font-medium animate-pulse text-sm">
@@ -55,6 +80,8 @@ function BlockNote({ doc, provider, darkMode, userInfo }: BlockNoteProps) {
       </div>
     );
   }
+
+  const BlockNoteView = BlockNoteViewComp;
 
   return (
     <div className="h-full w-full overflow-y-auto p-4 sm:p-8 md:p-12">

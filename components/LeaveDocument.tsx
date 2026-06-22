@@ -77,6 +77,14 @@ export default function LeaveDocument({
       </DialogTrigger>
 
       <DialogContent className="w-full max-w-md">
+        <DialogHeader>
+          <DialogTitle>Leave document</DialogTitle>
+          <DialogDescription>
+            You will lose access to the document and must be re-invited to
+            return.
+          </DialogDescription>
+        </DialogHeader>
+
         <div className="flex flex-col items-center justify-center text-center p-6">
           <div className="flex items-center justify-center mb-4">
             <div className="rounded-full bg-orange-100 dark:bg-orange-900/20 p-3">
