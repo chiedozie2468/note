@@ -1,12 +1,9 @@
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } },
-) {
+export async function GET(request: NextRequest, context: any) {
   try {
-    const userId = params.id;
+    const { id: userId } = await context.params;
 
     if (!userId) {
       return NextResponse.json(
