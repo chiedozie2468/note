@@ -8,7 +8,7 @@ export default async function DocumentPage({
   const { id } = await params;
 
   return (
-    <div className="w-full min-h-screen p-6">
+    <div className="w-full min-h-screen flex ">
       <Document id={id} />
     </div>
   );

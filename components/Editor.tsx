@@ -48,14 +48,16 @@ function BlockNote({ doc, provider, darkMode, userInfo }: BlockNoteProps) {
 
   if (!editor) {
     return (
-      <div className="h-full w-full flex items-center justify-center">
-        <div className="text-slate-400">Loading editor...</div>
+      <div className="h-full w-full flex items-center justify-center py-20">
+        <div className="text-zinc-400 font-medium animate-pulse text-sm">
+          Loading editor engine...
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="h-full w-full overflow-y-auto px-8 py-10 md:px-16 md:py-12">
+    <div className="h-full w-full overflow-y-auto px-6 py-8 sm:px-12 sm:py-10 md:px-16 md:py-12">
       <div className="max-w-4xl mx-auto min-h-full">
         <BlockNoteView
           editor={editor}
@@ -75,21 +77,17 @@ export default function Editor({ darkMode }: { darkMode: boolean }) {
   const [provider, setProvider] = useState<LiveblocksYjsProvider | null>(null);
   const [mounted, setMounted] = useState(false);
 
-  // Track client mount to avoid render-phase editor creation during hydration
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Initialize Yjs doc and provider
   useEffect(() => {
     if (!room) return;
 
     const yDoc = new Y.Doc();
     const yProvider = new LiveblocksYjsProvider(room, yDoc);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setDoc(yDoc as any);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setProvider(yProvider as any);
 
     return () => {
@@ -100,27 +98,32 @@ export default function Editor({ darkMode }: { darkMode: boolean }) {
 
   if (!doc || !provider || !mounted) {
     return (
-      <div className="h-full w-full flex items-center justify-center">
-        <div className="text-slate-400">Loading editor...</div>
+      <div className="flex h-full min-h-[400px] w-full flex-col items-center justify-center gap-4">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-300 border-t-cyan-500 dark:border-zinc-700 dark:border-t-cyan-400" />
+
+        <p className="animate-pulse text-sm font-medium text-slate-500 dark:text-zinc-400">
+          Synchronizing live components...
+        </p>
       </div>
     );
   }
 
   return (
     <LiveCursorProvider>
-      <div className="h-full w-full">
-        <div className="flex items-center gap-2 justify-end mb-10">
+      <div className="h-full w-full flex flex-col bg-amber-200">
+        {/* TRANSLATION & UTILITY PANEL FLOATED TOP-RIGHT INSIDE CONTAINER RIG */}
+        <div className="flex items-center gap-2 justify-end  border-b border-zinc-100  bg-zinc-50/50 dark:bg-zinc-900/10">
           <TranslateDocument doc={doc} />
-          {/* TranslateDocument */}
-
-          {/* ChatToDocument */}
         </div>
-        <BlockNote
-          doc={doc}
-          provider={provider}
-          darkMode={darkMode}
-          userInfo={userInfo}
-        />
+
+        <div className="flex-1 min-h-0">
+          <BlockNote
+            doc={doc}
+            provider={provider}
+            darkMode={darkMode}
+            userInfo={userInfo}
+          />
+        </div>
       </div>
     </LiveCursorProvider>
   );

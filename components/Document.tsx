@@ -71,12 +71,15 @@ function Document({ id }: { id: string }) {
   // Show loading until at least the API fetch completes.
   if (!docLoaded && !firestoreData) {
     return (
-      <div className="flex items-center justify-center h-screen text-xl dark:text-zinc-300">
-        Loading document...
+      <div className="flex h-full min-h-[400px] w-full flex-col items-center justify-center gap-4">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-300 border-t-cyan-500 dark:border-zinc-700 dark:border-t-cyan-400" />
+
+        <p className="animate-pulse text-sm font-medium text-slate-500 dark:text-zinc-400">
+          Loading document...
+        </p>
       </div>
     );
   }
-
   // If both sources returned nothing, the document doesn't exist or access is denied.
   if (docLoaded && !firestoreData && !apiData) {
     return (
@@ -131,19 +134,23 @@ function Document({ id }: { id: string }) {
         </form>
       </div>
 
-      <div className="flex max-w-6xl mx-auto justify-between items-center mb-5">
+      <div className="flex max-w-6xl mx-auto justify-between items-center mb-5  w-full px-6">
         <Avatar />
       </div>
-
-      <hr className="pb-10" />
+      {/* 
+      <hr className="pb-10" /> */}
 
       {/* EDITOR */}
-      <div className="flex-1 w-full flex justify-center p-4 sm:p-6">
-        <div className="w-full max-w-6xl h-full rounded-2xl overflow-hidden border bg-white dark:bg-[#0f0f12] shadow-2xl">
+      <div className="flex-1 w-full flex justify-center  sm:p-6">
+        <div className="w-full max-w-6xl h-full   overflow-hidden bg-white dark:bg-[#0f0f1211] border">
           <ClientSideSuspense
             fallback={
-              <div className="p-6 dark:text-zinc-400">
-                Loading collaboration...
+              <div className="flex h-full min-h-[400px] w-full flex-col items-center justify-center gap-4">
+                <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-300 border-t-cyan-500 dark:border-zinc-700 dark:border-t-cyan-400" />
+
+                <p className="text-sm font-medium text-slate-500 dark:text-zinc-400">
+                  Loading collaboration...
+                </p>
               </div>
             }
           >
