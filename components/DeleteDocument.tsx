@@ -13,11 +13,16 @@ import {
 } from "@/components/ui/dialog";
 
 import { Button } from "@/components/ui/button";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { usePathname, useRouter } from "next/navigation";
 import { deleteDocument } from "@/actions/actions";
 import { toast } from "sonner";
 
-export default function DeleteDocument() {
+export default function DeleteDocument({
+  triggerAsChild,
+}: {
+  triggerAsChild?: boolean;
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
@@ -47,12 +52,11 @@ export default function DeleteDocument() {
           setIsOpen(false);
 
           router.replace("/");
-        } else {
+        }
+        else {
           console.error("DELETE FAILED:", res);
 
-          toast.error(
-            res.error || "Failed to delete room"
-          );
+          toast.error(res.error || "Failed to delete room");
         }
       } catch (error) {
         console.error("CLIENT ERROR:", error);
@@ -65,20 +69,19 @@ export default function DeleteDocument() {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="destructive">
-          Delete
-        </Button>
+        {triggerAsChild ? (
+          <DropdownMenuItem data-variant="destructive">Delete</DropdownMenuItem>
+        ) : (
+          <Button variant="destructive">Delete</Button>
+        )}
       </DialogTrigger>
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>
-            Delete this document?
-          </DialogTitle>
+          <DialogTitle>Delete this document?</DialogTitle>
 
           <DialogDescription>
-            This will permanently delete the document and
-            remove all users.
+            This will permanently delete the document and remove all users.
           </DialogDescription>
         </DialogHeader>
 
@@ -88,15 +91,11 @@ export default function DeleteDocument() {
             onClick={handleDelete}
             disabled={isPending}
           >
-            {isPending
-              ? "Deleting..."
-              : "Delete"}
+            {isPending ? "Deleting..." : "Delete"}
           </Button>
 
           <DialogClose asChild>
-            <Button variant="secondary">
-              Cancel
-            </Button>
+            <Button variant="secondary">Cancel</Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>

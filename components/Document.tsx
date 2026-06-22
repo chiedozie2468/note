@@ -3,6 +3,16 @@
 import { ClientSideSuspense } from "@liveblocks/react";
 import React, { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { doc } from "firebase/firestore";
@@ -51,6 +61,7 @@ function Document({ id }: { id: string }) {
 
   const [input, setInput] = useState("");
   const [isPending, startTransition] = useTransition();
+  const [editOpen, setEditOpen] = useState(false);
   const { resolvedTheme } = useTheme();
   const isDarkMode = resolvedTheme === "dark";
   const isOwner = useUserOwn(createdBy);
@@ -90,47 +101,112 @@ function Document({ id }: { id: string }) {
   }
 
   return (
-    <div className="h-screen w-full flex flex-col bg-linear-to-br from-zinc-50 via-white to-zinc-100 dark:from-[#0a0a0a] dark:via-[#0f0f12] dark:to-black ">
-      {/* TOP BAR */}
-      <div className="w-full px-6 py-4 flex justify-center border-b border-black/5 dark:border-white/10 backdrop-blur-md bg-white/60 dark:bg-black/30">
+    <div className="h-screen w-full flex flex-col bg-linear-to-br from-zinc-50 via-white to-zinc-100 dark:from-[#0a0a0a] dark:via-[#0f0f12] dark:to-black">
+      {/* TOP BAR - transparent on mobile, subtle background on desktop */}
+      <div className="w-full px-4 sm:px-6 py-2 sm:py-4 flex justify-center sm:border-b sm:border-black/5 sm:backdrop-blur-md sm:bg-white/60 sm:dark:bg-black/30">
         <form
           onSubmit={updateTitle}
-          className="flex items-center gap-3 w-full max-w-5xl"
+          className="flex items-center w-full max-w-5xl gap-3"
         >
-          <Input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            className="flex-1 h-10 rounded-xl"
-            disabled={!isOwner}
-            title={
-              !isOwner ? "Only the owner can rename this document" : undefined
-            }
-          />
+          {/* Left: title / input and update button (desktop) */}
+          <div className="flex items-center gap-3 flex-1">
+            {isOwner ? (
+              <>
+                {/* Desktop inline input */}
+                <Input
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  className="hidden sm:block flex-1 h-10 rounded-xl"
+                  disabled={!isOwner}
+                  title={
+                    !isOwner
+                      ? "Only the owner can rename this document"
+                      : undefined
+                  }
+                />
 
-          {/* Update + owner actions only visible to the owner */}
-          {isOwner ? (
-            <>
-              <Button
-                disabled={isPending}
-                type="submit"
-                className="rounded-xl flex items-center gap-2"
-              >
-                <Pencil className="h-4 w-4" />
-                <span className="hidden sm:inline">Update</span>
-              </Button>
+                {/* Mobile title trigger - opens modal for editing */}
+                <Dialog open={editOpen} onOpenChange={setEditOpen}>
+                  <DialogTrigger asChild>
+                    <button
+                      type="button"
+                      className="sm:hidden text-lg font-semibold truncate text-left"
+                    >
+                      {title ?? "Untitled Document"}
+                    </button>
+                  </DialogTrigger>
 
-              <div className="flex flex-wrap items-center gap-2">
-                <ShareDocument title={title} />
-                <InviteUser />
-                <DeleteDocument />
-              </div>
-            </>
-          ) : (
-            <div className="flex flex-wrap items-center gap-2">
-              <ShareDocument title={title} />
-              <LeaveDocument />
-            </div>
-          )}
+                  <DialogContent className="max-w-md w-full">
+                    <DialogHeader>
+                      <DialogTitle>Edit document name</DialogTitle>
+                      <DialogDescription>
+                        Update the document name and save.
+                      </DialogDescription>
+                    </DialogHeader>
+
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        if (!input.trim()) return;
+                        startTransition(async () => {
+                          await updateDocumentTitle(id, input);
+                          setEditOpen(false);
+                        });
+                      }}
+                      className="flex flex-col gap-3 mt-4"
+                    >
+                      <Input
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        className="w-full"
+                      />
+
+                      <div className="flex justify-end gap-2">
+                        <DialogClose asChild>
+                          <Button variant="secondary">Cancel</Button>
+                        </DialogClose>
+                        <Button type="submit" disabled={isPending}>
+                          {isPending ? "Saving..." : "Save"}
+                        </Button>
+                      </div>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+
+                {/* Update button - desktop only */}
+                <Button
+                  type="submit"
+                  disabled={isPending}
+                  className="hidden sm:inline-flex rounded-xl"
+                >
+                  <Pencil className="h-4 w-4" />
+                  <span className="ml-2">Update</span>
+                </Button>
+              </>
+            ) : (
+              <span className="text-lg font-semibold truncate">
+                {title ?? "Untitled Document"}
+              </span>
+            )}
+          </div>
+
+          {/* Right: three-dots dropdown aligned far right */}
+          <div className="ml-auto">
+            {isOwner ? (
+              <ShareDocument title={title} compact>
+                <>
+                  <InviteUser triggerAsChild />
+                  <DeleteDocument triggerAsChild />
+                </>
+              </ShareDocument>
+            ) : (
+              <ShareDocument title={title} compact>
+                <>
+                  <LeaveDocument triggerAsChild />
+                </>
+              </ShareDocument>
+            )}
+          </div>
         </form>
       </div>
 

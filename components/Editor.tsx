@@ -110,13 +110,13 @@ export default function Editor({ darkMode }: { darkMode: boolean }) {
 
   return (
     <LiveCursorProvider>
-      <div className="h-full w-full flex flex-col bg-amber-200">
+      <div className="h-full w-full flex flex-col ">
         {/* TRANSLATION & UTILITY PANEL FLOATED TOP-RIGHT INSIDE CONTAINER RIG */}
-        <div className="flex items-center gap-2 justify-end  border-b border-zinc-100  bg-zinc-50/50 dark:bg-zinc-900/10">
+        {/* <div className="flex items-center gap-2 justify-end  border-b border-zinc-100  bg-zinc-50/50 dark:bg-zinc-900/10">
           <TranslateDocument doc={doc} />
-        </div>
+        </div> */}
 
-        <div className="flex-1 min-h-0">
+        <div className="flex-1 min-h-0 bg-yellow-400">
           <BlockNote
             doc={doc}
             provider={provider}

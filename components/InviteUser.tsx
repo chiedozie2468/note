@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 
 import { Button } from "@/components/ui/button";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { usePathname } from "next/navigation";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
@@ -29,7 +30,11 @@ interface Collaborator {
   role: string;
 }
 
-export default function InviteUser() {
+export default function InviteUser({
+  triggerAsChild,
+}: {
+  triggerAsChild?: boolean;
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [email, setEmail] = useState("");
@@ -123,7 +128,15 @@ export default function InviteUser() {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">Invite User</Button>
+        {triggerAsChild ? (
+          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+            Invite User
+          </DropdownMenuItem>
+        ) : (
+          <Button type="button" variant="outline" size="sm">
+            Invite User
+          </Button>
+        )}
       </DialogTrigger>
 
       <DialogContent className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 max-w-md w-full">
