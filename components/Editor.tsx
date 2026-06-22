@@ -57,7 +57,7 @@ function BlockNote({ doc, provider, darkMode, userInfo }: BlockNoteProps) {
   }
 
   return (
-    <div className="h-full w-full overflow-y-auto px-6 py-8 sm:px-12 sm:py-10 md:px-16 md:py-12">
+    <div className="h-full w-full overflow-y-auto p-4 sm:p-8 md:p-12">
       <div className="max-w-4xl mx-auto min-h-full">
         <BlockNoteView
           editor={editor}
@@ -116,7 +116,7 @@ export default function Editor({ darkMode }: { darkMode: boolean }) {
           <TranslateDocument doc={doc} />
         </div> */}
 
-        <div className="flex-1 min-h-0 bg-yellow-400">
+        <div className="flex-1 min-h-0 ">
           <BlockNote
             doc={doc}
             provider={provider}

@@ -94,7 +94,7 @@ function Document({ id }: { id: string }) {
   // If both sources returned nothing, the document doesn't exist or access is denied.
   if (docLoaded && !firestoreData && !apiData) {
     return (
-      <div className="flex items-center justify-center h-screen text-yellow-500">
+      <div className="flex items-center justify-center h-screen text-center px-4 text-zinc-500 dark:text-zinc-400">
         Document not found or you do not have access.
       </div>
     );
@@ -210,15 +210,15 @@ function Document({ id }: { id: string }) {
         </form>
       </div>
 
-      <div className="flex max-w-6xl mx-auto justify-between items-center mb-5  w-full px-6">
+      <div className="flex max-w-6xl mx-auto justify-between items-center w-full px-4 sm:px-8 mt-4">
         <Avatar />
       </div>
       {/* 
       <hr className="pb-10" /> */}
 
       {/* EDITOR */}
-      <div className="flex-1 w-full flex justify-center  sm:p-6">
-        <div className="w-full max-w-6xl h-full   overflow-hidden bg-white dark:bg-[#0f0f1211] border">
+      <div className="flex-1 w-full flex justify-center p-0 sm:p-6 md:p-8">
+        <div className="w-full max-w-6xl h-full overflow-hidden bg-white dark:bg-[#0f0f1211] rounded-none border-x-0 border-t sm:rounded-3xl sm:border">
           <ClientSideSuspense
             fallback={
               <div className="flex h-full min-h-[400px] w-full flex-col items-center justify-center gap-4">

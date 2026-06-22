@@ -48,6 +48,27 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* BlockNote responsive padding override for mobile-first design */
+.bn-editor {
+  padding-inline: 12px !important; /* Tight mobile gutters (4 * 3 = 12px) */
+  padding-block: 1px !important;
+  height: 90vh;
+}
+
+@media (min-width: 640px) {
+  .bn-editor {
+    padding-inline: 32px !important; /* sm: elegant desktop space */
+    padding-block: 32px !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .bn-editor {
+    padding-inline: 48px !important; /* md: premium spacious breathing room */
+    padding-block: 48px !important;
+  }
+}
+
 :root {
   --background: #f8fbff;
   --foreground: #111827;
